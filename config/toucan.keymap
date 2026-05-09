@@ -19,10 +19,10 @@
 
     combos {
         compatible = "zmk,combos";
-        combo_caps_lock {
-            timeout-ms = <50>;
+        combo_dual_shift_esc {
+            timeout-ms = <100>;
             key-positions = <24 35>;
-            bindings = <&kp CAPS>;
+            bindings = <&kp ESC>;
             layers = <0>;
         };
     };
