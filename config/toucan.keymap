@@ -59,7 +59,7 @@
                 &kp TAB   &kp Q &kp W &kp E &kp R &kp T   &kp Y &kp U  &kp I     &kp O   &kp P    &kp BSPC
                 &mt LCTRL CAPS &kp A &kp S &kp D &kp F &kp G   &kp H &kp J  &kp K     &kp L   &kp SEMI &mt_tp RCTRL SQT
                 &kp LSHFT &kp Z &kp X &kp C &kp V &kp B   &kp N &kp M  &kp COMMA &kp DOT &kp FSLH &kp RSHFT
-                                &kp LGUI &kp RET &td_sym   &td_nav &kp SPACE &kp RALT
+                                &kp LALT &kp RET &td_sym   &td_nav &kp SPACE &kp RGUI
             >;
         };
 
@@ -69,7 +69,7 @@
                 &kp TAB      &trans         &trans       &kp UP   &trans       &trans         &kp KP_DIVIDE &kp N7    &kp N8    &kp N9    &kp KP_MULTIPLY &kp BSPC
                 &trans       &trans         &kp LEFT     &kp DOWN &kp RIGHT    &studio_unlock &kp DOT       &kp N4    &kp N5    &kp N6    &kp KP_MINUS    &kp KP_PLUS
                 &bt BT_CLR   &bt BT_SEL 0   &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4 &kp KP_EQUAL  &kp N1    &kp N2    &kp N3    &trans          &trans
-                                                       &kp LGUI &kp RET      &trans         &trans &kp SPACE &kp N0
+                                                       &kp LALT &kp RET      &trans         &trans &kp SPACE &kp N0
             >;
         };
 
@@ -79,7 +79,7 @@
                 &kp TAB   &kp EXCL &kp AT &kp HASH &kp DLLR &kp PRCNT   &kp CARET &kp AMPS  &kp KP_MULTIPLY &kp LPAR &kp RPAR &kp BSPC
                 &mt LCTRL CAPS &trans   &trans &trans   &trans   &trans      &kp MINUS &kp EQUAL &kp LBKT        &kp RBKT &kp BSLH &kp GRAVE
                 &kp LSHFT &trans   &trans &trans   &trans   &trans      &kp UNDER &kp PLUS  &kp LBRC        &kp RBRC &kp PIPE &kp TILDE
-                                          &kp LGUI &kp RET  &trans      &trans    &kp SPACE &kp RALT
+                                          &kp LALT &kp RET  &trans      &trans    &kp SPACE &kp RGUI
             >;
         };
 
@@ -89,7 +89,7 @@
                 &kp TAB   &trans &kp F7 &kp F8 &kp F9 &kp F12   &kp C_VOL_DN &kp C_MUTE  &kp C_VOL_UP &trans &trans &kp BSPC
                 &mt LCTRL CAPS &trans &kp F4 &kp F5 &kp F6 &kp F11   &trans       &trans      &trans       &trans &trans &trans
                 &kp LSHFT &trans &kp F1 &kp F2 &kp F3 &kp F10   &trans       &trans      &trans       &trans &trans &trans
-                                   &kp LGUI &kp RET &td_sym   &td_nav &kp SPACE &kp RALT
+                                   &kp LALT &kp RET &td_sym   &td_nav &kp SPACE &kp RGUI
             >;
         };
         extra_1 {
