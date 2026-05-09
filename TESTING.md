@@ -28,8 +28,8 @@ ambiguous. Flag anything that doesn't behave as expected.
 ## BASE — RSHFT and combo
 
 - Hold the new bottom-right RSHFT, type `a`. Should produce `A`.
-- Press LSHFT + RSHFT simultaneously. Toggles Caps Lock. Press both
-  again to toggle off.
+- Press LSHFT + RSHFT simultaneously. Produces ESC (combo). 100 ms
+  window — both shifts must land within that.
 
 ## Thumbs
 
