@@ -128,5 +128,4 @@
 &zip_gestures {
     tap-detection;
     inertial-cursor;
-    circular-scroll;
 };

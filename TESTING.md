@@ -167,20 +167,6 @@ NAV/SYM.**
   scroll-flicks fall below the inertia trigger, or remove
   `inertial-cursor;` from `&zip_gestures`.
 
-### Circular scroll
-
-`zip_gestures` `circular-scroll` (default: outer 10% rim, requires
-absolute mode).
-
-- On any layer, place a finger on the outer ~10% of the touchpad and
-  trace a clockwise arc. Page scrolls down.
-- Counter-clockwise arc → scroll up.
-- Touch starting in the inner ~90% should NOT trigger circular
-  scroll — must move the cursor / scroll-layer-scroll as before.
-- On NAV/SYM, confirm circular scroll and the existing `xy_to_scroll`
-  mapping don't fight each other (a circular gesture should produce
-  smooth scroll, not double-step or cancel).
-
 ## Sleep / wake
 
 - Idle for ~60 minutes. Display switches to "Sleep" screen.
