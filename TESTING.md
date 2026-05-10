@@ -91,7 +91,8 @@ right thumbs:                  trans  SPACE  KP_ENTER
   most apps, distinct in some — calculators, Excel cell-edit).
 - Bottom-row col 6 → `.` (regular DOT, NumLock-safe).
 - Math keys: top col 10 = `/`, mid col 10 = `*`, mid col 11 = `-`,
-  bottom col 10 = `=`, bottom col 11 = `+`.
+  bottom col 10 = `=` (regular EQUAL, not KP_EQUAL — most hosts
+  ignore the HID keypad-equal code), bottom col 11 = `+`.
 
 ## NAV — right click
 
