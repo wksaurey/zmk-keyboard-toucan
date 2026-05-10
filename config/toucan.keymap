@@ -20,7 +20,8 @@
     combos {
         compatible = "zmk,combos";
         combo_dual_shift_esc {
-            timeout-ms = <100>;
+            timeout-ms = <2000>;
+            require-prior-idle-ms = <100>;
             key-positions = <24 35>;
             bindings = <&kp ESC>;
             layers = <0>;
