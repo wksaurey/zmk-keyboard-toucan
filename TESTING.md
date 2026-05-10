@@ -153,13 +153,19 @@ In absolute mode the chip's hardware tap-to-click no longer fires;
 ### Inertial cursor
 
 `zip_gestures` `inertial-cursor` (defaults: 2 px/ms threshold, 30%
-decay). **Cursor only — does not coast on the scroll layers.**
+decay). **Cursor only — the inertia handler emits cursor movement
+directly, bypassing the input-processor chain that maps to scroll on
+NAV/SYM.**
 
 - Flick a fast swipe on BASE and lift. Cursor should keep coasting
   briefly, then decelerate and stop.
 - Slow drag and lift. Cursor should NOT coast (below threshold).
-- Repeat the flick on NAV/SYM (where the trackpad scrolls). Scroll
-  should NOT coast — confirms the cursor-only scope.
+- **Known UX hazard:** flick fast on NAV/SYM. While the finger is
+  down you get scroll; after lift the inertia kicks in and produces a
+  cursor jolt (because inertia bypasses the scroll mapper). If this
+  is intolerable, raise `inertial-cursor-velocity-threshold` so
+  scroll-flicks fall below the inertia trigger, or remove
+  `inertial-cursor;` from `&zip_gestures`.
 
 ### Circular scroll
 
