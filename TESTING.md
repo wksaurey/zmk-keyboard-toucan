@@ -77,7 +77,7 @@ rows of col 6 (just left of the digit grid):
 
 ```
             col6   col7  col8  col9  col10  col11
-row 0:      MB2    7     8     9     /      BSPC
+row 0:      MB2    7     8     9     /      DEL
 row 1:      0      4     5     6     *      -
 row 2:      .      1     2     3     =      +
 right thumbs:                  trans  SPACE  KP_ENTER
@@ -97,6 +97,14 @@ right thumbs:                  trans  SPACE  KP_ENTER
 
 - Hold NAV, tap top-row col 6 (was `/` previously, now `&mkp MB2`) over
   any window. Context menu opens (right-click).
+
+## NAV — Delete and Ctrl+Alt+Del
+
+- Hold NAV, tap top-row col 11 → `Delete` (deletes character forward).
+- Ctrl+Alt+Del: hold left-pinky home (`LCTRL`), left-outer thumb
+  (`LALT`), right-inner thumb (`NAV`), then tap top-row col 11. The
+  host should see Ctrl+Alt+Delete (Windows lock screen, Task Manager,
+  etc.).
 
 ## NAV — Bluetooth + studio
 
