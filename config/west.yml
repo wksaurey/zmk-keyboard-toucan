@@ -10,6 +10,8 @@ manifest:
       url-base: https://github.com/caksoylar
     - name: geeksville
       url-base: https://github.com/geeksville
+    - name: halfdane
+      url-base: https://github.com/halfdane
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -20,5 +22,11 @@ manifest:
     - name: zmk-rgbled-widget
       remote: caksoylar
       revision: v0.3
+    - name: zmk-input-gestures
+      remote: halfdane
+      revision: c6590627ec627f49582ee945b880762fc715c2c9
+    - name: zmk-input-processors
+      remote: halfdane
+      revision: 7d18ba7af91e485bbd9febda150505fb38ce6d8a
   self:
     path: config
