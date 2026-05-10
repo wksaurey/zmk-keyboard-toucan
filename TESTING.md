@@ -130,42 +130,12 @@ right thumbs:                  trans  SPACE  KP_ENTER
 
 ## Touchpad
 
-The chip is now in **absolute mode**, with the
-`halfdane/zmk-input-gestures` processor in front of the existing scaler
-chain. Speed/feel may differ from prior tuning — re-tune
-`zip_xy_scaler` and the `sensitivity = "2x"` setting if needed.
-
-- Move cursor on the right-half touchpad. Cursor tracks; verify X and
-  Y directions still match (`x-invert;` carried over from the prior
-  config — confirm it still feels right after the absolute-mode swap).
+- Move cursor on the right-half touchpad. Speed scales at 2.0x (was
+  2.5x — slower than the original feel).
 - On NAV or SYM, slide on the touchpad → scroll.
 - **Vertical:** slide DOWN, page scrolls DOWN (natural-scroll style).
 - **Horizontal:** slide RIGHT, page scrolls RIGHT. (Y inverted, X not.)
-
-### Tap-to-click
-
-In absolute mode the chip's hardware tap-to-click no longer fires;
-`zip_gestures` re-implements it with `tap-detection` (default 120 ms).
-
-- Quick tap on the touchpad → left click.
-- Hold > 120 ms then drag → no click, just cursor movement.
-
-### Inertial cursor
-
-`zip_gestures` `inertial-cursor` (defaults: 2 px/ms threshold, 30%
-decay). **Cursor only — the inertia handler emits cursor movement
-directly, bypassing the input-processor chain that maps to scroll on
-NAV/SYM.**
-
-- Flick a fast swipe on BASE and lift. Cursor should keep coasting
-  briefly, then decelerate and stop.
-- Slow drag and lift. Cursor should NOT coast (below threshold).
-- **Known UX hazard:** flick fast on NAV/SYM. While the finger is
-  down you get scroll; after lift the inertia kicks in and produces a
-  cursor jolt (because inertia bypasses the scroll mapper). If this
-  is intolerable, raise `inertial-cursor-velocity-threshold` so
-  scroll-flicks fall below the inertia trigger, or remove
-  `inertial-cursor;` from `&zip_gestures`.
+- Scroll speed should feel ~30% slower than the upstream default.
 
 ## Sleep / wake
 

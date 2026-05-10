@@ -46,25 +46,3 @@ nice_view_spi: &spi0 {
 &glidepoint_listener {
     status = "okay";
 };
-
-/*
- * The halfdane gesture module hard-codes a reference to
- * DT_NODELABEL(glidepoint) for its pm_device pointer
- * (input_processor_gestures.c line ~103). On this split keyboard the
- * cirque chip — and thus the `glidepoint` label — only exists on the
- * right (peripheral) overlay. The gestures module compiles only on the
- * central (left), so without this re-declaration the build fails with
- * `__device_dts_ord_DT_N_NODELABEL_glidepoint_ORD undeclared`.
- *
- * Re-declaring `/split_inputs/glidepoint_split@0` here adds a second
- * label (`glidepoint`) to the existing input-split node, so the module
- * can resolve a device pointer. The pm pointer is stored in
- * dev->pm but never dereferenced at runtime by the gesture code, so
- * pointing it at the input-split is harmless.
- */
-/ {
-    split_inputs {
-        glidepoint: glidepoint_split@0 {
-        };
-    };
-};
