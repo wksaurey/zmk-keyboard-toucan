@@ -28,8 +28,20 @@ ambiguous. Flag anything that doesn't behave as expected.
 ## BASE — RSHFT and combo
 
 - Hold the new bottom-right RSHFT, type `a`. Should produce `A`.
-- Press LSHFT + RSHFT simultaneously. Produces ESC (combo). 100 ms
-  window — both shifts must land within that.
+- Press LSHFT + RSHFT simultaneously. Produces ESC keycode → toggles
+  CAPS LOCK at the host (OS-level esc/caps swap). The combo has a
+  2000 ms window after a 100 ms idle gate, so it does **not** fire
+  while typing flow — pause briefly first, then chord.
+
+## BASE — cut / copy / paste combos
+
+Bottom-row adjacent-key combos on the left hand. 50 ms window with
+125 ms idle gate, so they only fire after a brief pause.
+
+- Pause, then Z + X simultaneously → Ctrl+X (cut).
+- Pause, then X + C simultaneously → Ctrl+C (copy).
+- Pause, then C + V simultaneously → Ctrl+V (paste).
+- While typing words like `vex` or `exact`, the combos must NOT fire.
 
 ## Thumbs
 
@@ -59,12 +71,32 @@ ambiguous. Flag anything that doesn't behave as expected.
 
 ## NAV — numpad
 
-- Hold NAV. Type 7,8,9 / 4,5,6 / 1,2,3 from the right hand. All produce
-  digits regardless of host Num Lock state. (Was a bug fixed in commit
-  `26d59a6` — KP_N* keycodes only emitted digits with Num Lock on.)
-- Right-outer thumb → `0`.
-- Math keys: top-row col 6 = `/`, top-row col 11 = `*`, home col 11 = `-`,
-  home col 12 = `+`, bottom col 7 = `=`, home col 7 = `.`.
+Right-hand cluster after the rework — digits in their numpad positions,
+math operators stacked in cols 10/11, `0` and `.` on the home/bottom
+rows of col 6 (just left of the digit grid):
+
+```
+            col6   col7  col8  col9  col10  col11
+row 0:      MB2    7     8     9     /      BSPC
+row 1:      0      4     5     6     *      -
+row 2:      .      1     2     3     =      +
+right thumbs:                  trans  SPACE  KP_ENTER
+```
+
+- Hold NAV. Type 7,8,9 / 4,5,6 / 1,2,3 from the right hand and `0` from
+  col 6 row 1. All produce digits regardless of host Num Lock state.
+  (Bug fix carried over from commit `26d59a6` — `N0..N9` and `DOT`
+  used instead of `KP_*` digit codes.)
+- Right-outer thumb → `KP_ENTER` (numpad Enter; identical to Enter for
+  most apps, distinct in some — calculators, Excel cell-edit).
+- Bottom-row col 6 → `.` (regular DOT, NumLock-safe).
+- Math keys: top col 10 = `/`, mid col 10 = `*`, mid col 11 = `-`,
+  bottom col 10 = `=`, bottom col 11 = `+`.
+
+## NAV — right click
+
+- Hold NAV, tap top-row col 6 (was `/` previously, now `&mkp MB2`) over
+  any window. Context menu opens (right-click).
 
 ## NAV — Bluetooth + studio
 
@@ -90,12 +122,50 @@ ambiguous. Flag anything that doesn't behave as expected.
 
 ## Touchpad
 
-- Move cursor on the right-half touchpad. Speed scales at 2.0x (was
-  2.5x — slower than the original feel).
+The chip is now in **absolute mode**, with the
+`halfdane/zmk-input-gestures` processor in front of the existing scaler
+chain. Speed/feel may differ from prior tuning — re-tune
+`zip_xy_scaler` and the `sensitivity = "2x"` setting if needed.
+
+- Move cursor on the right-half touchpad. Cursor tracks; verify X and
+  Y directions still match (`x-invert;` carried over from the prior
+  config — confirm it still feels right after the absolute-mode swap).
 - On NAV or SYM, slide on the touchpad → scroll.
 - **Vertical:** slide DOWN, page scrolls DOWN (natural-scroll style).
 - **Horizontal:** slide RIGHT, page scrolls RIGHT. (Y inverted, X not.)
-- Scroll speed should feel ~30% slower than the upstream default.
+
+### Tap-to-click
+
+In absolute mode the chip's hardware tap-to-click no longer fires;
+`zip_gestures` re-implements it with `tap-detection` (default 120 ms).
+
+- Quick tap on the touchpad → left click.
+- Hold > 120 ms then drag → no click, just cursor movement.
+
+### Inertial cursor
+
+`zip_gestures` `inertial-cursor` (defaults: 2 px/ms threshold, 30%
+decay). **Cursor only — does not coast on the scroll layers.**
+
+- Flick a fast swipe on BASE and lift. Cursor should keep coasting
+  briefly, then decelerate and stop.
+- Slow drag and lift. Cursor should NOT coast (below threshold).
+- Repeat the flick on NAV/SYM (where the trackpad scrolls). Scroll
+  should NOT coast — confirms the cursor-only scope.
+
+### Circular scroll
+
+`zip_gestures` `circular-scroll` (default: outer 10% rim, requires
+absolute mode).
+
+- On any layer, place a finger on the outer ~10% of the touchpad and
+  trace a clockwise arc. Page scrolls down.
+- Counter-clockwise arc → scroll up.
+- Touch starting in the inner ~90% should NOT trigger circular
+  scroll — must move the cursor / scroll-layer-scroll as before.
+- On NAV/SYM, confirm circular scroll and the existing `xy_to_scroll`
+  mapping don't fight each other (a circular gesture should produce
+  smooth scroll, not double-step or cancel).
 
 ## Sleep / wake
 
