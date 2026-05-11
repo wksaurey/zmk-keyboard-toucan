@@ -110,11 +110,13 @@ Two ways to click while NAV or SYM is held:
   (MB2). Tap the trackpad while holding NAV → context menu opens.
   Slide without tapping → just scroll, no button held. On BASE the
   same tap stays as a left-click.
-- **NAV top-row col 6 → explicit left-click (`&mkp MB1`).** Useful
-  for click-and-drag: hold NAV, hold the col-6 key to keep the left
-  button down, drag with the trackpad, release the key to drop. Was
-  `MB2` before — moved to `MB1` once trackpad tap covered right-click
-  on NAV.
+- **NAV / SYM top-row col 6 → explicit right-click (`&mkp MB2`).**
+  Dedicated reliable right-click button on both layers — backup for
+  when the chip's tap detection misses (the trackpad-tap path is
+  best-effort). Note that NAV pos 6 was briefly `MB1` for an intended
+  click-and-drag workflow that didn't work because NAV puts the
+  trackpad into scroll mode; switched to `MB2` after the tap-to-
+  right-click path turned out to be unreliable.
 - Side effect to be aware of: the chip's secondary-tap (tap-and-drag)
   is still globally on, so a deliberate double-tap-then-drag on
   NAV/SYM produces a *right-click* drag (because BTN_0 stays held and
@@ -142,8 +144,10 @@ Two ways to click while NAV or SYM is held:
 
 ## SYM — special chars and right-thumb Enter
 
-- Hold SYM. Top row: `!@#$%`. Right side top: `^&*()`. Home row right:
-  `-=[]\` and grave on rightmost. Bottom row right: `_+{}|~`.
+- Hold SYM. Top row: `!@#$%`. Right side top: `MB2  &*()` (col 6 is
+  now right-click via `&mkp MB2`; `^` was displaced — still available
+  via Shift+6 on BASE). Home row right: `-=[]\` and grave on
+  rightmost. Bottom row right: `_+{}|~`.
 - **Right-outer thumb on SYM = `Enter`** (replaces the BASE-layer
   `RGUI`). Lets you hit Enter one-handed on the right while the right
   hand is in trackpad territory — hold SYM with right-inner thumb,
