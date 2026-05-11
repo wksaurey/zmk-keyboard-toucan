@@ -117,8 +117,10 @@
          *     when the chip detects a tap, 0 when the tap window ends.
          *     The listener interprets it as MB1 press+release.
          *
-         * Suppressing BTN_TOUCH (remap to KEY_RESERVED — a no-op in
-         * the listener's handle_key_code switch) means cursor / scroll
+         * Suppressing BTN_TOUCH (remap to 0 — equivalent to
+         * KEY_RESERVED in newer Zephyr but that macro doesn't exist
+         * in Zephyr 3.5.0 which ZMK uses; raw 0 hits the listener's
+         * no-op default branch the same way) means cursor / scroll
          * touches that ARE NOT taps never produce a held button.
          * Remapping BTN_0 -> BTN_1 turns the chip's tap pulse into a
          * clean right click.
@@ -127,7 +129,7 @@
          * with no button held; double-tap-and-drag = right-click drag
          * (contained to deliberate gesture).
          */
-        map = <INPUT_BTN_TOUCH INPUT_KEY_RESERVED>,
+        map = <INPUT_BTN_TOUCH 0>,
               <INPUT_BTN_0      INPUT_BTN_1>;
     };
 
