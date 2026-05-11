@@ -131,8 +131,9 @@ right thumbs:                  trans  SPACE  KP_ENTER
 
 ## Touchpad
 
-- Move cursor on the right-half touchpad. Speed scales at 2.0x (was
-  2.5x — slower than the original feel).
+- Move cursor on the right-half touchpad. Speed scales at 2.25x
+  (middle ground between the original 2.5x and the slower 2.0x
+  tuning).
 - On NAV or SYM, slide on the touchpad → scroll.
 - **Vertical:** slide DOWN, page scrolls DOWN (natural-scroll style).
 - **Horizontal:** slide RIGHT, page scrolls RIGHT. (Y inverted, X not.)
