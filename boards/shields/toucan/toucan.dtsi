@@ -103,6 +103,13 @@
         };
     };
 
+    tap_to_rclick: tap_to_rclick {
+        compatible = "zmk,input-processor-code-mapper";
+        #input-processor-cells = <0>;
+        type = <INPUT_EV_KEY>;
+        map = <INPUT_BTN_TOUCH INPUT_BTN_1>;
+    };
+
     glidepoint_listener: glidepoint_listener {
         compatible = "zmk,input-listener";
         status = "disabled";
@@ -111,6 +118,7 @@
         scroller {
             layers = <1 2>;
             input-processors = <
+                &tap_to_rclick
                 &zip_xy_to_scroll_mapper
                 &zip_scroll_scaler 1 7
                 &zip_scroll_transform INPUT_TRANSFORM_Y_INVERT

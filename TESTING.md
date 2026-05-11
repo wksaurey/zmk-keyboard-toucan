@@ -94,10 +94,24 @@ right thumbs:                  trans  SPACE  KP_ENTER
   bottom col 10 = `=` (regular EQUAL, not KP_EQUAL — most hosts
   ignore the HID keypad-equal code), bottom col 11 = `+`.
 
-## NAV — right click
+## NAV / SYM — trackpad clicks
 
-- Hold NAV, tap top-row col 6 (was `/` previously, now `&mkp MB2`) over
-  any window. Context menu opens (right-click).
+Two ways to click while NAV or SYM is held:
+
+- **Trackpad tap → right-click on NAV/SYM.** The cirque chip's
+  hardware tap-to-click still emits `INPUT_BTN_TOUCH`, but on layers
+  1 and 2 the layer-override input processor `tap_to_rclick` remaps
+  it to `INPUT_BTN_1` (= MB2). Tap the trackpad while holding NAV →
+  context menu opens. On BASE the same tap stays as a left-click.
+- **NAV top-row col 6 → explicit left-click (`&mkp MB1`).** Useful
+  for click-and-drag: hold NAV, hold the col-6 key to keep the left
+  button down, drag with the trackpad, release the key to drop. Was
+  `MB2` before — moved to `MB1` once trackpad tap covered right-click
+  on NAV.
+- Side effect to be aware of: the chip's secondary-tap (tap-and-drag)
+  is still globally on, so a double-tap-and-drag on NAV/SYM produces
+  a *right-click* drag rather than a left-click drag. Harmless if
+  unused; use the explicit `MB1` button for left-click drag on NAV.
 
 ## NAV — Delete and Ctrl+Alt+Del
 
