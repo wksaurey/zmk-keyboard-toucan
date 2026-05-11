@@ -135,10 +135,14 @@ either layer-thumb works.
 - Bottom row left: BT_CLR + BT_SEL 0..4. Tap `BT_SEL 1` and confirm
   the display's profile area updates.
 
-## SYM — special chars
+## SYM — special chars and right-thumb Enter
 
 - Hold SYM. Top row: `!@#$%`. Right side top: `^&*()`. Home row right:
   `-=[]\` and grave on rightmost. Bottom row right: `_+{}|~`.
+- **Right-outer thumb on SYM = `Enter`** (replaces the BASE-layer
+  `RGUI`). Lets you hit Enter one-handed on the right while the right
+  hand is in trackpad territory — hold SYM with right-inner thumb,
+  tap right-outer thumb, release SYM.
 
 ## ADJ — function and media
 
