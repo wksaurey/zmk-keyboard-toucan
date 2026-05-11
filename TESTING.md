@@ -52,18 +52,18 @@ Bottom-row adjacent-key combos on the left hand. 50 ms window with
 
 ## Layer keys — momentary (hold)
 
-- Hold left-inner (SYM). Display shows "SYM". Release; back to "BASE".
+- Hold left-inner (NAV). Display shows "NAV". Release; back to "BASE".
   **Note any noticeable activation lag** — that's the tap-dance latency
   question.
-- Same for right-inner (NAV).
+- Same for right-inner (SYM).
 - Hold both inner thumbs simultaneously → display shows "ADJ".
 
 ## Layer keys — toggle (double-tap)
 
-- Quick double-tap left-inner. Display shows "SYM" and stays. Type `!`
-  (top-row leftmost on SYM) — produces EXCL.
+- Quick double-tap left-inner. Display shows "NAV" and stays. Press
+  the right-half numpad cluster → produces digits.
 - Double-tap left-inner again → returns to BASE.
-- Repeat with right-inner / NAV.
+- Repeat with right-inner / SYM (test by typing `!` on top-row col 1).
 
 ## NAV — arrows on ESDF
 
