@@ -114,13 +114,16 @@ Two ways to click while NAV or SYM is held:
   a *right-click* drag rather than a left-click drag. Harmless if
   unused; use the explicit `MB1` button for left-click drag on NAV.
 
-## NAV — Delete and Ctrl+Alt+Del
+## NAV / SYM — Delete and Ctrl+Alt+Del
 
-- Hold NAV, tap top-row col 11 → `Delete` (deletes character forward).
-- Ctrl+Alt+Del: hold left-pinky home (`LCTRL`), left-outer thumb
-  (`LALT`), right-inner thumb (`NAV`), then tap top-row col 11. The
-  host should see Ctrl+Alt+Delete (Windows lock screen, Task Manager,
-  etc.).
+`DEL` lives at top-row col 11 on **both** NAV and SYM (mirrored), so
+either layer-thumb works.
+
+- Hold NAV (or SYM), tap top-row col 11 → `Delete` (forward delete).
+- Ctrl+Alt+Del: hold `LCTRL` (left pinky home-row), `LALT` (left outer
+  thumb), the layer-thumb (left-inner for NAV, right-inner for SYM),
+  then tap top-row col 11. Host should see Ctrl+Alt+Delete (Windows
+  lock screen, Task Manager, etc.).
 
 ## NAV — Bluetooth + studio
 
