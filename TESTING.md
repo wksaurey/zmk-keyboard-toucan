@@ -98,21 +98,23 @@ right thumbs:                  trans  SPACE  KP_ENTER
 
 Two ways to click while NAV or SYM is held:
 
-- **Trackpad tap → right-click on NAV/SYM.** The cirque emits both
-  `INPUT_BTN_TOUCH` (touch-presence) and `INPUT_BTN_0` (chip's tap
-  pulse) on a tap; on layers 1 and 2 the `tap_to_rclick` mapper
-  rewrites both to `INPUT_BTN_1` (MB2). Tap the trackpad while
-  holding NAV → context menu opens. On BASE the same tap stays as a
-  left-click.
+- **Trackpad tap → right-click on NAV/SYM.** On layers 1 and 2 the
+  `tap_to_rclick` mapper suppresses the chip's `INPUT_BTN_TOUCH`
+  presence event (so non-tap touches don't hold MB2 during scroll)
+  and remaps `INPUT_BTN_0` (the chip's tap pulse) to `INPUT_BTN_1`
+  (MB2). Tap the trackpad while holding NAV → context menu opens.
+  Slide without tapping → just scroll, no button held. On BASE the
+  same tap stays as a left-click.
 - **NAV top-row col 6 → explicit left-click (`&mkp MB1`).** Useful
   for click-and-drag: hold NAV, hold the col-6 key to keep the left
   button down, drag with the trackpad, release the key to drop. Was
   `MB2` before — moved to `MB1` once trackpad tap covered right-click
   on NAV.
 - Side effect to be aware of: the chip's secondary-tap (tap-and-drag)
-  is still globally on, so a double-tap-and-drag on NAV/SYM produces
-  a *right-click* drag rather than a left-click drag. Harmless if
-  unused; use the explicit `MB1` button for left-click drag on NAV.
+  is still globally on, so a deliberate double-tap-then-drag on
+  NAV/SYM produces a *right-click* drag (because BTN_0 stays held and
+  is remapped to MB2). Harmless if unused; use the explicit `MB1`
+  button for left-click drag on NAV.
 
 ## NAV / SYM — Delete and Ctrl+Alt+Del
 
