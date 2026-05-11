@@ -71,28 +71,33 @@ Bottom-row adjacent-key combos on the left hand. 50 ms window with
 
 ## NAV — numpad
 
-Right-hand cluster after the rework — digits in their numpad positions,
-math operators stacked in cols 10/11, `0` and `.` on the home/bottom
-rows of col 6 (just left of the digit grid):
+Right-hand cluster — digits in their natural numpad positions, math
+operators in the pinky columns (10 = pinky home, 11 = pinky reach),
+`0` back on the right-outer thumb, `.` under the strongest aux finger:
 
 ```
             col6   col7  col8  col9  col10  col11
-row 0:      MB2    7     8     9     /      DEL
-row 1:      0      4     5     6     *      -
-row 2:      .      1     2     3     =      +
-right thumbs:                  trans  SPACE  KP_ENTER
+row 0:      MB1    7     8     9     ,      BSPC
+row 1:      .      4     5     6     +      -
+row 2:      =      1     2     3     *      /
+right thumbs:                  trans  SPACE  0
 ```
 
-- Hold NAV. Type 7,8,9 / 4,5,6 / 1,2,3 from the right hand and `0` from
-  col 6 row 1. All produce digits regardless of host Num Lock state.
-  (Bug fix carried over from commit `26d59a6` — `N0..N9` and `DOT`
-  used instead of `KP_*` digit codes.)
-- Right-outer thumb → `KP_ENTER` (numpad Enter; identical to Enter for
-  most apps, distinct in some — calculators, Excel cell-edit).
-- Bottom-row col 6 → `.` (regular DOT, NumLock-safe).
-- Math keys: top col 10 = `/`, mid col 10 = `*`, mid col 11 = `-`,
-  bottom col 10 = `=` (regular EQUAL, not KP_EQUAL — most hosts
-  ignore the HID keypad-equal code), bottom col 11 = `+`.
+- Hold NAV. Type 7,8,9 / 4,5,6 / 1,2,3 from the right hand. All
+  produce digits regardless of host Num Lock state (bug fix carried
+  over from `26d59a6` — `N0..N9` and `DOT` used instead of `KP_*`
+  digit codes).
+- Right-outer thumb → `0`.
+- Home-row col 6 → `.` (regular DOT, NumLock-safe).
+- Bottom-row col 6 → `=` (regular EQUAL, not KP_EQUAL — most hosts
+  ignore the HID keypad-equal code).
+- Top-row col 10 → `,` (comma — thousands separator).
+- Math ops in pinky columns:
+  - **Home row:** `+` (col 10, pinky home) / `-` (col 11, pinky reach)
+  - **Bottom row:** `*` (col 10) / `/` (col 11)
+- `MB1` (top col 6) — explicit left-click button for click-and-drag.
+- Top-right (col 11) is `BSPC` on NAV — `DEL` only lives on SYM now,
+  see the next section.
 
 ## NAV / SYM — trackpad clicks
 
@@ -116,16 +121,16 @@ Two ways to click while NAV or SYM is held:
   is remapped to MB2). Harmless if unused; use the explicit `MB1`
   button for left-click drag on NAV.
 
-## NAV / SYM — Delete and Ctrl+Alt+Del
+## SYM — Delete and Ctrl+Alt+Del
 
-`DEL` lives at top-row col 11 on **both** NAV and SYM (mirrored), so
-either layer-thumb works.
+`DEL` now lives at top-row col 11 of **SYM only**. NAV top-right is
+`BSPC` (numpad-context backspace) after the numpad redesign.
 
-- Hold NAV (or SYM), tap top-row col 11 → `Delete` (forward delete).
+- Hold SYM, tap top-row col 11 → `Delete` (forward delete).
 - Ctrl+Alt+Del: hold `LCTRL` (left pinky home-row), `LALT` (left outer
-  thumb), the layer-thumb (left-inner for NAV, right-inner for SYM),
-  then tap top-row col 11. Host should see Ctrl+Alt+Delete (Windows
-  lock screen, Task Manager, etc.).
+  thumb), `SYM` (right-inner thumb), then tap SYM top-row col 11
+  (right pinky reach). Host should see Ctrl+Alt+Delete (Windows lock
+  screen, Task Manager, etc.).
 
 ## NAV — Bluetooth + studio
 
