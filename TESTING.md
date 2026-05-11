@@ -98,11 +98,12 @@ right thumbs:                  trans  SPACE  KP_ENTER
 
 Two ways to click while NAV or SYM is held:
 
-- **Trackpad tap → right-click on NAV/SYM.** The cirque chip's
-  hardware tap-to-click still emits `INPUT_BTN_TOUCH`, but on layers
-  1 and 2 the layer-override input processor `tap_to_rclick` remaps
-  it to `INPUT_BTN_1` (= MB2). Tap the trackpad while holding NAV →
-  context menu opens. On BASE the same tap stays as a left-click.
+- **Trackpad tap → right-click on NAV/SYM.** The cirque emits both
+  `INPUT_BTN_TOUCH` (touch-presence) and `INPUT_BTN_0` (chip's tap
+  pulse) on a tap; on layers 1 and 2 the `tap_to_rclick` mapper
+  rewrites both to `INPUT_BTN_1` (MB2). Tap the trackpad while
+  holding NAV → context menu opens. On BASE the same tap stays as a
+  left-click.
 - **NAV top-row col 6 → explicit left-click (`&mkp MB1`).** Useful
   for click-and-drag: hold NAV, hold the col-6 key to keep the left
   button down, drag with the trackpad, release the key to drop. Was

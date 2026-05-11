@@ -107,7 +107,17 @@
         compatible = "zmk,input-processor-code-mapper";
         #input-processor-cells = <0>;
         type = <INPUT_EV_KEY>;
-        map = <INPUT_BTN_TOUCH INPUT_BTN_1>;
+        /*
+         * The cirque driver emits two distinct events for a tap:
+         *   INPUT_BTN_TOUCH on touch-down / touch-end (presence)
+         *   INPUT_BTN_0     from the chip's hardware tap pulse
+         * Both map to MB1 in the input-listener. To get tap == MB2 on
+         * NAV/SYM, both have to be rewritten — otherwise the BTN_0
+         * cycle leaks a clean MB1 press+release inside the longer MB2
+         * presence-window and apps see a left click.
+         */
+        map = <INPUT_BTN_TOUCH INPUT_BTN_1>,
+              <INPUT_BTN_0      INPUT_BTN_1>;
     };
 
     glidepoint_listener: glidepoint_listener {
