@@ -90,7 +90,7 @@
         nav {
             display-name = "NAV";
             bindings = <
-                &kp TAB      &trans         &trans       &kp UP   &trans       &trans         &mkp MB2      &kp N7    &kp N8    &kp N9    &kp COMMA       &kp BSPC
+                &kp TAB      &trans         &trans       &kp UP   &trans       &mkp MB1       &mkp MB2      &kp N7    &kp N8    &kp N9    &kp COMMA       &kp BSPC
                 &trans       &trans         &kp LEFT     &kp DOWN &kp RIGHT    &studio_unlock &kp DOT       &kp N4    &kp N5    &kp N6    &kp KP_PLUS     &kp KP_MINUS
                 &trans       &bt BT_SEL 0   &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4 &kp EQUAL     &kp N1    &kp N2    &kp N3    &kp KP_MULTIPLY &kp KP_DIVIDE
                                                        &kp LALT &kp RET      &trans         &trans &kp SPACE &kp N0
