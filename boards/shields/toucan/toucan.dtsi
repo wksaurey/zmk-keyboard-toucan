@@ -103,36 +103,6 @@
         };
     };
 
-    tap_to_rclick: tap_to_rclick {
-        compatible = "zmk,input-processor-code-mapper";
-        #input-processor-cells = <0>;
-        type = <INPUT_EV_KEY>;
-        /*
-         * The cirque driver emits two distinct key events:
-         *   INPUT_BTN_TOUCH — sticky presence event, fires once at
-         *     touch-down and once ~50 ms after finger lifts. The
-         *     input-listener interprets it as MB1 held for the entire
-         *     touch.
-         *   INPUT_BTN_0    — the chip's hardware tap pulse: fires 1
-         *     when the chip detects a tap, 0 when the tap window ends.
-         *     The listener interprets it as MB1 press+release.
-         *
-         * Suppressing BTN_TOUCH (remap to 0 — equivalent to
-         * KEY_RESERVED in newer Zephyr but that macro doesn't exist
-         * in Zephyr 3.5.0 which ZMK uses; raw 0 hits the listener's
-         * no-op default branch the same way) means cursor / scroll
-         * touches that ARE NOT taps never produce a held button.
-         * Remapping BTN_0 -> BTN_1 turns the chip's tap pulse into a
-         * clean right click.
-         *
-         * Net: tap on NAV/SYM = right click; slide on NAV/SYM = scroll
-         * with no button held; double-tap-and-drag = right-click drag
-         * (contained to deliberate gesture).
-         */
-        map = <INPUT_BTN_TOUCH 0>,
-              <INPUT_BTN_0      INPUT_BTN_1>;
-    };
-
     glidepoint_listener: glidepoint_listener {
         compatible = "zmk,input-listener";
         status = "disabled";
@@ -141,7 +111,6 @@
         scroller {
             layers = <1 2>;
             input-processors = <
-                &tap_to_rclick
                 &zip_xy_to_scroll_mapper
                 &zip_scroll_scaler 1 7
                 &zip_scroll_transform INPUT_TRANSFORM_Y_INVERT
