@@ -16,7 +16,11 @@ manifest:
       import: app/west.yml
     - name: cirque-input-module
       remote: geeksville
-      revision: toucan
+      # Pinned to a verified-good commit (includes the late-Jan-2026
+      # interrupt-handling fixes: level-triggered IRQs + extra ZIDLE
+      # IRQs to protect against missed interrupts). The toucan branch
+      # is otherwise a moving target.
+      revision: effec100f0cd3a38e7fba3adfea394586cc84cab
     - name: zmk-rgbled-widget
       remote: caksoylar
       revision: v0.3
