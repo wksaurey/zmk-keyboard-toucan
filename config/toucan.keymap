@@ -91,7 +91,7 @@
             bindings = <
                 &kp TAB      &trans         &trans       &kp UP   &trans       &trans         &mkp MB2      &kp N7    &kp N8    &kp N9    &kp COMMA       &kp BSPC
                 &trans       &trans         &kp LEFT     &kp DOWN &kp RIGHT    &studio_unlock &kp DOT       &kp N4    &kp N5    &kp N6    &kp KP_PLUS     &kp KP_MINUS
-                &bt BT_CLR   &bt BT_SEL 0   &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4 &kp EQUAL     &kp N1    &kp N2    &kp N3    &kp KP_MULTIPLY &kp KP_DIVIDE
+                &trans       &bt BT_SEL 0   &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4 &kp EQUAL     &kp N1    &kp N2    &kp N3    &kp KP_MULTIPLY &kp KP_DIVIDE
                                                        &kp LALT &kp RET      &trans         &trans &kp SPACE &kp N0
             >;
         };
@@ -111,7 +111,7 @@
             bindings = <
                 &kp TAB   &trans &kp F7 &kp F8 &kp F9 &kp F12   &kp C_VOL_DN &kp C_MUTE  &kp C_VOL_UP &trans &trans &kp BSPC
                 &mt LCTRL CAPS &trans &kp F4 &kp F5 &kp F6 &kp F11   &trans       &trans      &trans       &trans &trans &trans
-                &kp LSHFT &trans &kp F1 &kp F2 &kp F3 &kp F10   &trans       &trans      &trans       &trans &trans &trans
+                &bt BT_CLR &trans &kp F1 &kp F2 &kp F3 &kp F10   &trans       &trans      &trans       &trans &trans &trans
                                    &kp LALT &kp RET &td_nav   &td_sym &kp SPACE &kp RGUI
             >;
         };

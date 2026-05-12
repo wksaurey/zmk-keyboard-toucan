@@ -139,8 +139,21 @@ Two ways to click while NAV or SYM is held:
 - Hold NAV, press G (home-row col 5) → studio_unlock. With USB
   connected, ZMK Studio in a browser (https://zmk.studio) should
   become editable.
-- Bottom row left: BT_CLR + BT_SEL 0..4. Tap `BT_SEL 1` and confirm
-  the display's profile area updates.
+- Bottom row left: BT_SEL 0..4 on positions 25–29. Tap `BT_SEL 1` and
+  confirm the display's profile area updates.
+- `BT_CLR` is **no longer on NAV** (was position 24 / left-pinky
+  bottom). Moved to ADJ at the same physical position so it can't be
+  hit accidentally while holding LCTRL for Ctrl+arrow gestures.
+- NAV pos 24 is now `&trans` → falls through to BASE `LSHFT`.
+
+## ADJ — BT_CLR (relocated)
+
+- Activate ADJ (hold both inner thumbs, or toggle one + hold the
+  other), then press the bottom-row leftmost key (where `LSHFT` was on
+  ADJ; same position as `BT_CLR` used to be on NAV).
+- Tap once → clears bonded profile for the current BT slot. **Confirm
+  intentional** — if you just did this and lost the host pairing, BT_CLR
+  is exactly what cleared it. Re-pair on the host.
 
 ## SYM — special chars and right-thumb Enter
 
