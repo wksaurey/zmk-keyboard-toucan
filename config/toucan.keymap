@@ -122,7 +122,7 @@
                 &trans    &kp ESC   &kp Q  &kp W  &kp E     &trans   &trans &trans &trans &trans &trans &trans
                 &trans    &kp LSHFT &kp A  &kp S  &kp D     &kp F    &trans &trans &trans &trans &trans &trans
                 &trans    &kp LCTRL &trans &trans &trans    &kp M    &trans &trans &trans &trans &trans &trans
-                                           &trans &kp SPACE &trans   &trans &trans &trans
+                                           &trans &kp SPACE &tog GAME   &tog GAME &trans &trans
             >;
         };
 
