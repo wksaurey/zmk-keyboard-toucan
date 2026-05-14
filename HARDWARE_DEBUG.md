@@ -128,3 +128,70 @@ wire from pad to pad.
   orientation if the PCB was hand-soldered.
 - **Cracked trace** — rare without obvious physical trauma. Look for
   pinches near the case mounting points.
+
+## Right-half lockup — pending diagnostics
+
+The right half occasionally hangs during continuous trackpad use (whole
+half: keys + trackpad stop, requires power-cycle to recover). Prior
+mitigations in `24da3be` (cirque SHA pin, `CONFIG_ZMK_IDLE_TIMEOUT=0`,
+stack bumps to 4096) did not eliminate it. Next layer of diagnostics
+to apply if it keeps happening — config-only, all in
+`boards/shields/toucan/toucan_right.conf`:
+
+### 1. Hardware watchdog — quality-of-life
+
+Auto-resets the right half when the kernel stops kicking the WDT (no
+more power-cycle to recover; ~1-2 s blackout, then it reconnects).
+
+```
+CONFIG_WDT=y
+CONFIG_WDT_NRFX=y
+CONFIG_ZMK_BEHAVIORS_WATCHDOG=y   # if available in current ZMK
+```
+
+Does not diagnose anything — just stops lockups from costing work.
+
+### 2. Stack overflow detection — rule in/out stack as cause
+
+If the cirque driver hot path overflows the stack, we get a panic with
+a traceback instead of a silent deadlock.
+
+```
+CONFIG_STACK_SENTINEL=y
+CONFIG_THREAD_STACK_INFO=y
+CONFIG_THREAD_ANALYZER=y
+```
+
+Only useful if the cause IS stack overflow. With stacks already at
+4096 this is *less* likely than before — adding it cleanly rules it
+in or out.
+
+### 3. USB CDC console — read the panic on next lockup
+
+A panic from #2 only matters if we can see it. Console over USB lets
+us plug the right half in after a hang and read the traceback.
+
+```
+CONFIG_USB_DEVICE_STACK=y
+CONFIG_USB_CDC_ACM=y
+CONFIG_UART_CONSOLE=y
+CONFIG_LOG=y
+```
+
+Defer until #1+#2 are in place and we've confirmed the issue persists
+without a stack-overflow panic. If silent: cause is somewhere other
+than stack (I²C bus stuck, mutex deadlock, ISR storm, BLE state
+machine wedged), and we'll need live logging or a hang detector
+thread to narrow further.
+
+### Suggested order
+
+1. Apply #1 + #2 in one build cycle. Live with the bug for a few
+   days — note whether lockups produce a panic on the (still-attached
+   nothing) console, and whether watchdog recovery feels acceptable.
+2. If panics never fire and lockups persist: add #3, capture a USB
+   log session during a representative usage block, and look for the
+   last thread/log activity before silence.
+3. If still unsolved after that: file upstream against
+   `geeksville/cirque-input-module` with the trace + reproduction
+   pattern.
