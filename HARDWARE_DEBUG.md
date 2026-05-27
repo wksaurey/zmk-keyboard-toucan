@@ -134,27 +134,24 @@ wire from pad to pad.
 The right half occasionally hangs during continuous trackpad use (whole
 half: keys + trackpad stop, requires power-cycle to recover). Prior
 mitigations in `24da3be` (cirque SHA pin, `CONFIG_ZMK_IDLE_TIMEOUT=0`,
-stack bumps to 4096) did not eliminate it. Next layer of diagnostics
-to apply if it keeps happening — config-only, all in
-`boards/shields/toucan/toucan_right.conf`:
+stack bumps to 4096) did not eliminate it. Next failure observed
+2026-05-27 12:53:00 during cursor use, battery ~50% (brown-out ruled
+out). Diagnostics plan below, all in
+`boards/shields/toucan/toucan_right.conf`.
 
-### 1. Hardware watchdog — quality-of-life
+**Diagnose first, then aim.** The watchdog approach in an earlier
+draft of this plan (`CONFIG_WDT=y`, `CONFIG_ZMK_BEHAVIORS_WATCHDOG=y`)
+turned out to be wrong on two counts: the parent symbol is
+`WATCHDOG`, not `WDT`; and `ZMK_BEHAVIORS_WATCHDOG` doesn't exist in
+this ZMK version. Even with the symbol names fixed, the watchdog is
+*recovery*, not *diagnosis* — and ZMK doesn't ship a WDT kicker, so
+enabling the driver alone is a no-op. Recovery decisions wait until
+we know what's actually failing.
 
-Auto-resets the right half when the kernel stops kicking the WDT (no
-more power-cycle to recover; ~1-2 s blackout, then it reconnects).
+### 1. Stack overflow detection — rule in/out stack as cause
 
-```
-CONFIG_WDT=y
-CONFIG_WDT_NRFX=y
-CONFIG_ZMK_BEHAVIORS_WATCHDOG=y   # if available in current ZMK
-```
-
-Does not diagnose anything — just stops lockups from costing work.
-
-### 2. Stack overflow detection — rule in/out stack as cause
-
-If the cirque driver hot path overflows the stack, we get a panic with
-a traceback instead of a silent deadlock.
+If the cirque driver hot path overflows the stack, we get a kernel
+panic with a traceback instead of a silent deadlock.
 
 ```
 CONFIG_STACK_SENTINEL=y
@@ -164,12 +161,13 @@ CONFIG_THREAD_ANALYZER=y
 
 Only useful if the cause IS stack overflow. With stacks already at
 4096 this is *less* likely than before — adding it cleanly rules it
-in or out.
+in or out. **Useless without #2** (a console to read the panic);
+without it, a sentinel-triggered halt looks identical to a hang.
 
-### 3. USB CDC console — read the panic on next lockup
+### 2. USB CDC console — read what the right half is doing
 
-A panic from #2 only matters if we can see it. Console over USB lets
-us plug the right half in after a hang and read the traceback.
+Console over USB lets us plug the right half in after a failure and
+read the last log lines / panic traceback.
 
 ```
 CONFIG_USB_DEVICE_STACK=y
@@ -178,21 +176,43 @@ CONFIG_UART_CONSOLE=y
 CONFIG_LOG=y
 ```
 
-Defer until #1+#2 are in place and we've confirmed the issue persists
-without a stack-overflow panic. If silent: cause is somewhere other
-than stack (I²C bus stuck, mutex deadlock, ISR storm, BLE state
-machine wedged), and we'll need live logging or a hang detector
-thread to narrow further.
+Cost: active USB device stack on the right half full-time (small
+power overhead, mild risk of BLE/USB stack interaction). Worth it
+because it's the only way to distinguish three very different
+failure modes that all *look* identical from the host's perspective:
+
+- **Firmware crashed** (stack overflow, mutex deadlock, ISR storm) —
+  CDC console either doesn't enumerate, or prints a panic on connect.
+- **Firmware alive, BLE link dropped** — CDC console enumerates and
+  prints normally. Diagnostic attention moves to the radio side
+  (BLE state machine, peripheral-central pairing); the firmware
+  isn't the problem.
+- **I²C bus to cirque is stuck** — CDC enumerates but logs show the
+  cirque driver thread last-alive timestamp frozen.
+
+### 3. Recovery (deferred — needs code, not config)
+
+Once #1+#2 tell us what's failing, recovery becomes a real decision:
+
+- **If firmware crashes:** add a hardware watchdog. Needs *both*
+  `CONFIG_WATCHDOG=y` + `CONFIG_WDT_NRFX=y` *and* a kicker (custom
+  thread, ~20 LOC, or a `CONFIG_TASK_WDT` integration with per-thread
+  channels). Config alone is dormant — ZMK doesn't call `wdt_setup()`
+  or `wdt_feed()`.
+- **If BLE link drops:** watchdog is irrelevant; pursue radio-side
+  fixes.
+- **If I²C stuck:** consider an I²C-bus recovery sequence on
+  driver-side timeout. Upstream against `geeksville/cirque-input-module`.
 
 ### Suggested order
 
-1. Apply #1 + #2 in one build cycle. Live with the bug for a few
-   days — note whether lockups produce a panic on the (still-attached
-   nothing) console, and whether watchdog recovery feels acceptable.
-2. If panics never fire and lockups persist: add #3, capture a USB
-   log session during a representative usage block, and look for the
-   last thread/log activity before silence.
-3. If still unsolved after that: file upstream against
+1. Apply #1 + #2 in one build cycle. Flash right half. Live with the
+   bug for a few days.
+2. On the next failure: plug the right half into USB. Open a serial
+   monitor (PuTTY / `picocom`) on the CDC port. Capture whatever
+   prints — panic traceback, last log lines, or nothing.
+3. Based on what we see, pick the right recovery path from #3 above.
+4. If still unsolved after that: file upstream against
    `geeksville/cirque-input-module` with the trace + reproduction
    pattern.
 
