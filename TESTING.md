@@ -99,29 +99,27 @@ right thumbs:                  trans  SPACE  0
 - Top-right (col 11) is `BSPC` on NAV — `DEL` only lives on SYM now,
   see the next section.
 
-## NAV / SYM — trackpad clicks
+## NAV / SYM — trackpad clicks and drag
 
-Two ways to click while NAV or SYM is held:
+The `tap_to_rclick` input-processor was removed (commit `2924e69`)
+because layer-conditional input-chain swapping was the leading
+suspect for cursor lockups during fast layer-tap + drag. Right-click
+is now exclusively via dedicated key bindings.
 
-- **Trackpad tap → right-click on NAV/SYM.** On layers 1 and 2 the
-  `tap_to_rclick` mapper suppresses the chip's `INPUT_BTN_TOUCH`
-  presence event (so non-tap touches don't hold MB2 during scroll)
-  and remaps `INPUT_BTN_0` (the chip's tap pulse) to `INPUT_BTN_1`
-  (MB2). Tap the trackpad while holding NAV → context menu opens.
-  Slide without tapping → just scroll, no button held. On BASE the
-  same tap stays as a left-click.
-- **NAV / SYM top-row col 6 → explicit right-click (`&mkp MB2`).**
-  Dedicated reliable right-click button on both layers — backup for
-  when the chip's tap detection misses (the trackpad-tap path is
-  best-effort). Note that NAV pos 6 was briefly `MB1` for an intended
-  click-and-drag workflow that didn't work because NAV puts the
-  trackpad into scroll mode; switched to `MB2` after the tap-to-
-  right-click path turned out to be unreliable.
-- Side effect to be aware of: the chip's secondary-tap (tap-and-drag)
-  is still globally on, so a deliberate double-tap-then-drag on
-  NAV/SYM produces a *right-click* drag (because BTN_0 stays held and
-  is remapped to MB2). Harmless if unused; use the explicit `MB1`
-  button for left-click drag on NAV.
+Current behavior:
+
+- **Trackpad on BASE / NAV** — cursor mode. Slide moves the cursor.
+  Tap fires MB1 (chip's BTN_TOUCH/BTN_0 default behavior).
+- **Trackpad on SYM** — scroll mode. Slide scrolls the page (Y
+  inverted: slide down → page down). Tap still fires MB1 but is
+  rarely useful on SYM.
+- **NAV / SYM top-row col 6 (Y position) → `&mkp MB2`.** Hold NAV or
+  SYM and tap Y to right-click. Hold to keep MB2 down for right-drag
+  with the trackpad.
+- **NAV top-row col 5 (T position) → `&mkp MB1`** (commit `0fd0665`).
+  Hold NAV + T, slide on the trackpad to drag. Works because NAV is
+  no longer in the scroller's `layers` list — trackpad-on-NAV is
+  cursor, not scroll, so motion + held MB1 = drag.
 
 ## SYM — Delete and Ctrl+Alt+Del
 
@@ -170,17 +168,92 @@ Two ways to click while NAV or SYM is held:
 
 - Activate ADJ (hold both inner thumbs, or toggle one then hold the
   other).
-- F1–F12 on the left hand.
+- F-keys on the left hand: F1–F10 + F12 (11 keys). F11 was displaced
+  from middle-row col 5 by `&tog GAME` (commit `dff378a`).
 - Vol-down / mute / vol-up on the right home row.
 - Confirm TAB on top-row col 0 of ADJ now actually emits Tab. (Fixed
   in `52895bc` — was `&mo TAB` which is invalid.)
+- ADJ middle-row col 5 (G position) → `&tog GAME` — toggles into the
+  GAME layer. See GAME section below.
+
+## GAME — FPS-style gaming layer
+
+Added in `dff378a` and polished in `0c30f4c`. ESDF replaces WASD,
+with mods on the pinky column. Recovered game keys are remapped so
+common FPS bindings (Q/W/E/R/F, M, R-as-reload) stay reachable.
+
+### Enter / exit
+
+- **Enter:** activate ADJ (hold both inner thumbs), tap middle-row
+  col 5 (G position) → display shows "GAME".
+- **Exit:** tap right inner thumb (single tap of `&tog GAME` bound
+  directly inside GAME). Display returns to "BASE".
+- The ADJ-G path **does not** exit GAME because layer 4 (GAME)
+  outranks layer 3 (ADJ) and overrides pos 17 with `&kp F` — so the
+  exit is on the inner thumb on purpose.
+
+### Movement and mods
+
+- Slide your hand one column right of WASD home. Index/middle/ring
+  fingers should rest on F/D/S.
+- Press E (top, middle finger) → host receives W.
+- Press S (home, ring) → host receives A.
+- Press D (home, middle) → host receives S.
+- Press F (home, index) → host receives D.
+- Press A (home, pinky) → host receives LSHIFT (sprint).
+- Press Z (bottom, pinky) → host receives LCTRL (crouch).
+- Press left-middle thumb → host receives SPACE (jump).
+
+### Recovered game keys
+
+These are mapped because the ESDF shift displaces the original
+QWERTY positions:
+
+- Q position → host receives TAB (scoreboard/inventory).
+- W position → host receives Q.
+- R position → host receives E.
+- T position → host receives R (reload).
+- G position → host receives F.
+- B position → host receives M.
+
+### Pass-through keys
+
+These fall through to BASE and arrive unchanged at the host: TAB,
+LCTRL/CAPS (left outer home), LSHFT (left outer bottom), X, C, V,
+ALT (left outer thumb), the entire right half, and the right-outer
+thumb (RGUI/Super).
+
+### ESC
+
+ESC is not directly bound on GAME. Tap the left outer home-row key
+(physical Caps Lock position) → falls through to BASE's
+`&mt LCTRL CAPS` → tap fires CAPS → OS-level Caps→Esc swap delivers
+ESC. There is a ~200ms tap-vs-hold disambiguation latency; fine for
+menu transitions, not snappy.
+
+## NUMGAME — held weapon-switch sublayer
+
+Held by the left inner thumb (`&mo NUMGAME`, defined in `0c30f4c`).
+Numbers stay live only while the thumb is held; release returns to
+GAME. The middle row's letter bindings (A=Shift, S/D/F=movement,
+G=F) are overridden by numbers while held — weapon-switch is a
+deliberate pause action so this is acceptable.
+
+- Hold left inner thumb. Display does not change layer name (GAME
+  is still shown because NUMGAME shares display).
+- Top row left half: Q→1, W→2, E→3, R→4, T→5.
+- Middle row left half: A→6, S→7, D→8, F→9, G→0.
+- Bottom row left half: pass-through to GAME (LCTRL on Z, etc.).
+- Right half: all pass-through to GAME (which mostly falls through
+  to BASE).
 
 ## Touchpad
 
 - Move cursor on the right-half touchpad. Speed scales at 2.25x
   (middle ground between the original 2.5x and the slower 2.0x
   tuning).
-- On NAV or SYM, slide on the touchpad → scroll.
+- On SYM only, slide on the touchpad → scroll. (NAV is cursor mode
+  to support click-and-drag via NAV-T; only SYM stays scroll.)
 - **Vertical:** slide DOWN, page scrolls DOWN (natural-scroll style).
 - **Horizontal:** slide RIGHT, page scrolls RIGHT. (Y inverted, X not.)
 - Scroll speed should feel ~30% slower than the upstream default.
