@@ -120,9 +120,9 @@
         game {
             display-name = "GAME";
             bindings = <
-                &trans    &kp TAB   &kp Q  &kp W  &kp E     &kp R    &trans &trans &trans &trans &trans &trans
+                &kp ESC   &kp TAB   &kp Q  &kp W  &kp E     &kp R    &trans &trans &trans &trans &trans &trans
                 &trans    &kp LSHFT &kp A  &kp S  &kp D     &kp F    &trans &trans &trans &trans &trans &trans
-                &kp RET   &kp LCTRL &trans &trans &trans    &kp M    &trans &trans &trans &trans &trans &trans
+                &kp RET   &kp LCTRL &kp T  &kp C  &kp G     &kp M    &trans &trans &trans &trans &trans &trans
                                            &trans &kp SPACE &mo NUMGAME   &tog GAME &trans &trans
             >;
         };
