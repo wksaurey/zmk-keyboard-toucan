@@ -241,6 +241,35 @@ Once #1+#2 tell us what's failing, recovery becomes a real decision:
    `geeksville/cirque-input-module` with the trace + reproduction
    pattern.
 
+### Capturing a Bluetooth HCI snoop log
+
+Useful when the lockup might be on the BLE side (link supervision
+timeout, controller wedge, host stack stall) rather than firmware-side.
+`btmon` taps the kernel's HCI monitor socket and writes every HCI
+packet to a `.btsnoop` file readable by Wireshark.
+
+```
+sudo btmon -w toucan-hang.btsnoop
+```
+
+Run it before reproducing the hang; Ctrl-C after the keyboard locks up.
+
+**Watch the file size.** `btmon -w` writes unbounded — no built-in
+size cap exists. A long capture on a busy adapter (multiple devices,
+audio streaming) can grow into the GBs and contribute to OOM.
+Mitigations:
+
+- bound the run by time: `sudo timeout 1h btmon -w toucan-hang.btsnoop`
+  (stops cleanly after 1 hour),
+- check periodically: `watch -n 30 'ls -lh ~/toucan-hang.btsnoop'` and
+  Ctrl-C the capture before it gets out of hand,
+- start the capture only once you sense the hang is imminent,
+- disconnect other BT devices first (especially A2DP audio sinks) to
+  keep the log focused on the keyboard.
+
+Do **not** commit `.btsnoop` captures to the repo — they're large and
+contain raw traffic from every connected BT device.
+
 ## Charging fault diagnosis
 
 Use this when USB-C is plugged in but the on-screen battery percentage
@@ -457,3 +486,50 @@ Less common, but worth checking:
   adapter + known-good cable.
 - **Cell at 100%** — CHG LED off and % not climbing is the *correct*
   behavior at full charge. Only a concern when % is well below 100.
+
+## Flashing — bootloader enumerates but no `XIAO-BOOT` mount appears
+
+Symptom: double-tap reset, the desktop shows a "device connected"
+toast, `lsusb` lists the bootloader (`2886:0064 XIAO nRF52840 Plus`
+for the Plus, or similar for the base XIAO), but no FAT volume mounts
+and `lsblk` shows no new block device. Drag-and-drop flashing is
+impossible until that volume appears.
+
+Quick triage:
+
+```
+lsmod | grep usb_storage
+```
+
+- **Empty** → the kernel can't bind the bootloader's mass-storage
+  interface. The bootloader is fine; Linux just has no driver.
+- **Present** → the module loaded but the FS isn't auto-mounting.
+  Find the device with `lsblk`, then
+  `udisksctl mount -b /dev/sdX1` (or install `udisks2` if missing).
+
+If `usb_storage` is empty, try `sudo modprobe usb_storage`. On an
+**Arch / EndeavourOS host that has pending kernel updates**, expect:
+
+```
+modprobe: FATAL: Module usb_storage not found in directory
+/lib/modules/<running-kernel>
+```
+
+That means `pacman` updated the `linux` package, wiped the old
+kernel's `/lib/modules/<old>` tree, and the still-running old kernel
+now has *no* dynamically-loadable modules at all (not just
+`usb_storage`). Confirm with:
+
+```
+uname -r                   # running kernel
+ls /lib/modules/           # installed module trees
+pacman -Q linux            # installed linux package version
+```
+
+If `uname -r` doesn't match a directory under `/lib/modules/`, **reboot**.
+That alone fixes the flash flow — `usb_storage` autoloads on the
+bootloader's next enumeration and the `XIAO-BOOT` volume mounts.
+
+Prevention: install `kernel-modules-hook` from the AUR. It preserves
+the old kernel's module tree across `pacman` upgrades until you reboot,
+so on-demand module loads keep working in the running session.

@@ -1,0 +1,3 @@
+# Bluetooth HCI snoop captures (see HARDWARE_DEBUG.md). Large and
+# contain raw traffic from every connected BT device — never commit.
+*.btsnoop
