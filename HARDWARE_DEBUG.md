@@ -134,10 +134,11 @@ wire from pad to pad.
 The right half occasionally hangs during continuous trackpad use (whole
 half: keys + trackpad stop, requires power-cycle to recover). Prior
 mitigations in `24da3be` (cirque SHA pin, `CONFIG_ZMK_IDLE_TIMEOUT=0`,
-stack bumps to 4096) did not eliminate it. Next failure observed
-2026-05-27 12:53:00 during cursor use, battery ~50% (brown-out ruled
-out). Diagnostics plan below, all in
-`boards/shields/toucan/toucan_right.conf`.
+stack bumps to 4096) did not eliminate it — those remain in place
+permanently. Next failure observed 2026-05-27 12:53:00 during cursor
+use, battery ~50% (brown-out ruled out). Diagnostics plan below; the
+config-side bits live in `boards/shields/toucan/toucan_right.conf`,
+and the console plumbing is wired via a snippet in `build.yaml`.
 
 **Diagnose first, then aim.** The watchdog approach in an earlier
 draft of this plan (`CONFIG_WDT=y`, `CONFIG_ZMK_BEHAVIORS_WATCHDOG=y`)
@@ -156,7 +157,6 @@ panic with a traceback instead of a silent deadlock.
 ```
 CONFIG_STACK_SENTINEL=y
 CONFIG_THREAD_STACK_INFO=y
-CONFIG_THREAD_ANALYZER=y
 ```
 
 Only useful if the cause IS stack overflow. With stacks already at
@@ -164,17 +164,30 @@ Only useful if the cause IS stack overflow. With stacks already at
 in or out. **Useless without #2** (a console to read the panic);
 without it, a sentinel-triggered halt looks identical to a hang.
 
+(Not adding `CONFIG_THREAD_ANALYZER`: it only emits output when
+something calls `thread_analyzer_run()` — ZMK doesn't, and we have no
+`CONFIG_THREAD_ANALYZER_AUTO` interval set. It's compiled-in
+dead-weight without one of those.)
+
 ### 2. USB CDC console — read what the right half is doing
 
-Console over USB lets us plug the right half in after a failure and
-read the last log lines / panic traceback.
+Console output over USB lets us plug the right half in after a
+failure and read the last log lines / panic traceback. Wired via the
+ZMK `zmk-usb-logging` snippet on the right-half entry in `build.yaml`:
 
+```yaml
+- board: seeeduino_xiao_ble
+  shield: toucan_right rgbled_adapter
+  snippet: zmk-usb-logging
 ```
-CONFIG_USB_DEVICE_STACK=y
-CONFIG_USB_CDC_ACM=y
-CONFIG_UART_CONSOLE=y
-CONFIG_LOG=y
-```
+
+The snippet pulls in both the Kconfig selects (`CONFIG_ZMK_USB_LOGGING`
+→ `USB_DEVICE_STACK`, `USB_CDC_ACM`, `UART_CONSOLE`, `USB_UART_CONSOLE`,
+`UART_LINE_CTRL`, `LOG`, etc.) **and** the devicetree `chosen`
+redirect that points `zephyr,console` at the CDC ACM uart. Adding
+the raw Kconfig symbols by hand without the DTS override produces an
+enumerated-but-mute port — see the dead-end documented in commit
+`e80a432`.
 
 Cost: active USB device stack on the right half full-time (small
 power overhead, mild risk of BLE/USB stack interaction). Worth it
@@ -187,27 +200,39 @@ failure modes that all *look* identical from the host's perspective:
   prints normally. Diagnostic attention moves to the radio side
   (BLE state machine, peripheral-central pairing); the firmware
   isn't the problem.
-- **I²C bus to cirque is stuck** — CDC enumerates but logs show the
-  cirque driver thread last-alive timestamp frozen.
+- **SPI bus to cirque is stuck** — CDC enumerates but logs show the
+  cirque driver thread last-alive timestamp frozen. (Cirque on
+  Toucan is on `spi0` per `toucan_right.overlay`, not I²C; the XIAO
+  I²C controller is disabled on this shield.)
+
+**Heisenbug caveat:** always-on USB changes scheduler load, ISR
+cadence, and idle/sleep behavior. If the lockup *stops* reproducing
+under diag firmware, that's itself a data point — suspect a sleep
+or timing-sensitive path and consider keeping the diag build as a
+separate `build.yaml` entry so you can A/B-flip.
 
 ### 3. Recovery (deferred — needs code, not config)
 
 Once #1+#2 tell us what's failing, recovery becomes a real decision:
 
 - **If firmware crashes:** add a hardware watchdog. Needs *both*
-  `CONFIG_WATCHDOG=y` + `CONFIG_WDT_NRFX=y` *and* a kicker (custom
-  thread, ~20 LOC, or a `CONFIG_TASK_WDT` integration with per-thread
-  channels). Config alone is dormant — ZMK doesn't call `wdt_setup()`
-  or `wdt_feed()`.
+  `CONFIG_WATCHDOG=y` + `CONFIG_WDT_NRFX=y` *and* a kicker. Two
+  paths: a custom thread (~20 LOC: register a channel, `wdt_feed()`
+  on a kernel timer) or `CONFIG_TASK_WDT` + `CONFIG_TASK_WDT_HW_FALLBACK`
+  with per-thread channels. Recommended default: TASK_WDT — it
+  integrates cleanly with Zephyr's existing thread layer instead of
+  reinventing the kicker. The single-thread custom kicker is the
+  fallback if the trace points at a kernel-level hang rather than
+  one specific thread.
 - **If BLE link drops:** watchdog is irrelevant; pursue radio-side
   fixes.
-- **If I²C stuck:** consider an I²C-bus recovery sequence on
-  driver-side timeout. Upstream against `geeksville/cirque-input-module`.
+- **If SPI stuck:** consider a bus-recovery sequence on driver-side
+  timeout. Upstream against `geeksville/cirque-input-module`.
 
 ### Suggested order
 
-1. Apply #1 + #2 in one build cycle. Flash right half. Live with the
-   bug for a few days.
+1. Apply #1 + the `zmk-usb-logging` snippet to the right-half build
+   entry. Flash right half. Live with the bug for a few days.
 2. On the next failure: plug the right half into USB. Open a serial
    monitor (PuTTY / `picocom`) on the CDC port. Capture whatever
    prints — panic traceback, last log lines, or nothing.
