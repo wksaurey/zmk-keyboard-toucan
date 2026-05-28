@@ -233,13 +233,74 @@ Once #1+#2 tell us what's failing, recovery becomes a real decision:
 
 1. Apply #1 + the `zmk-usb-logging` snippet to the right-half build
    entry. Flash right half. Live with the bug for a few days.
-2. On the next failure: plug the right half into USB. Open a serial
-   monitor (PuTTY / `picocom`) on the CDC port. Capture whatever
-   prints — panic traceback, last log lines, or nothing.
-3. Based on what we see, pick the right recovery path from #3 above.
+2. On the next failure: follow the "Capturing logs after a lockup"
+   procedure below.
+3. Based on what the capture shows, pick the right recovery path
+   from #3 above.
 4. If still unsolved after that: file upstream against
    `geeksville/cirque-input-module` with the trace + reproduction
    pattern.
+
+### Capturing logs after a lockup
+
+When the right half locks up, the goal is to read the kernel log
+(and panic dump, if any) over the USB CDC console wired by the
+`zmk-usb-logging` snippet.
+
+**Critical — do NOT power-cycle the right half** between the lockup
+and the capture. The log buffer lives in RAM. Toggling the slide
+switch off (or letting the battery die) wipes it.
+
+#### Procedure
+
+1. Lockup happens → note the time and what you were doing. Don't
+   touch the right half.
+2. Within ~2 minutes (see "Time constraints" below): plug USB-C
+   into the right half. Slide switch stays ON.
+3. Windows enumerates a new serial port. Device Manager →
+   "Ports (COM & LPT)" → "USB Serial Device (COMx)". Note the COM
+   number.
+4. Open PuTTY (or any serial terminal) on COMx. Settings: 115200
+   8N1, no flow control. CDC ACM is speed-independent so the baud
+   is informational, but 115200 is the convention.
+5. Whatever was queued in the ringbuf streams out when PuTTY opens
+   the port and asserts DTR.
+6. Save the capture (PuTTY: Session → Logging → "Printable output"
+   → pick a file path *before* opening the connection).
+7. Power-cycle the right half to recover.
+
+#### Time constraints
+
+The log buffer is small:
+
+- `CONFIG_LOG_BUFFER_SIZE=8192` — formatted log strings
+- `CONFIG_USB_CDC_ACM_RINGBUF_SIZE=1024` — CDC TX ringbuf to host
+
+When the host isn't connected, the ringbuf fills and older entries
+are dropped, not held.
+
+- **Panic case (kernel halted):** the panic dump is the *last* thing
+  emitted. Nothing displaces it after. Hours later is fine — even
+  overnight, as long as power stays on.
+- **Live case (firmware alive, BLE link dropped):** firmware keeps
+  logging. Ring churns continuously. Plug in within ~2-5 minutes to
+  catch disconnect-time messages before they scroll out.
+
+You won't know up front which case you're in. Default to "plug in
+within a couple minutes" and you cover both.
+
+#### Interpreting the output
+
+| What you see                                                          | Failure mode                                                                              |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `E: ***** USAGE FAULT *****` / `>>> ZEPHYR FATAL ERROR 2`             | Stack overflow (FATAL ERROR 2). "Current thread" names the failing stack.                 |
+| Other `>>> ZEPHYR FATAL ERROR N`                                      | Other kernel panic — hardfault, mutex deadlock detector, etc. Code identifies the class.  |
+| Live heartbeat / normal log lines, no panic                           | Firmware never died. Failure is on the BLE link side, not the firmware.                   |
+| CDC enumerates but port is silent                                     | Firmware halted before logging, or HardFault took down output before flush.               |
+| No enumeration at all                                                 | USB stack itself is dead. HardFault, MPU fault, or hardware-level issue.                  |
+
+The interpretation maps directly onto the recovery options in
+section #3 above.
 
 ### Capturing a Bluetooth HCI snoop log
 
