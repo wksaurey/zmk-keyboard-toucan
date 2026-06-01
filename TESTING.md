@@ -256,9 +256,9 @@ acceptable.
   confirm on-device whether the OLED shows "GAMENUM" or stays "GAME".)
 - Top row left half: physical Q→1, W→2, E→3, R→4, T→5.
 - Middle row left half: physical A→6, S→7, D→8, F→9, G→0.
-- Bottom row: physical V → G and physical B → T (G and T recovered
-  here after the GAME-layer Z/X/C shift displaced them); the rest of
-  the row falls through to GAME.
+- Bottom row: physical V → G and physical B → T. G was displaced from
+  GAME by the Z/X/C shift; T was relocated within GAMENUM (it was never
+  on GAME). The rest of the row falls through to GAME.
 - Right half: pass-through to GAME (itself `&trans` → BASE).
 
 ## Touchpad
