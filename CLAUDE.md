@@ -83,20 +83,22 @@ play: movement (WASD via the shifted ESDF cluster), jump (SPACE thumb), crouch
 (LCTRL), abilities E/LSHIFT/F, ultimate (Q), reload (R), scoreboard (TAB), text
 chat (RET), menu (ESC).
 
-- **Team-Up abilities are Z / X / C** (Team-Up Ability 1/2/3 in Rivals). All three
-  are on the GAME bottom row — physical X→Z, C→X, V→C. This is the whole reason
-  for the Z/X/C row; do not treat them as generic/unused keys. Rivals caps team-ups
-  at exactly **3 slots** (Z/X/C), so no team-up combo can ever appear on a key the
-  GAME layer can't reach — full coverage is guaranteed by the game's own cap.
+- **Team-Up abilities are Z / X / C** — confirmed in Kolter's in-game keybind menu
+  (Settings → Keyboard). All three are on the GAME bottom row (physical X→Z, C→X,
+  V→C); that is the reason the row exists. Rivals' team-up slots are 1/2/3 = Z/X/C,
+  so the team-up combos are fully covered on the left half. (Note: **T is not a
+  team-up** — earlier confusion; the `T` on GAMENUM is vestigial in this config.)
 - **M = change-hero**, rebound from the default H, and also used in other games —
   keep it on GAME (physical B). Default H is unused.
 - **LALT = hero profile**, rebound from the default F1 — this is why LALT is
   explicitly bound on the GAME outer-left thumb (pos36). Not vestigial; keep it.
-- **Push-to-talk is T**, currently on GAMENUM (held), which is awkward for a
-  hold-to-talk key. **Mouse-bound (not on the keyboard): melee (V), ping (G / middle
-  mouse), and the show-breakable-objects key** — the GAME layer intentionally omits
-  these; don't flag them as missing in coverage reviews.
+- **Push-to-talk = grave/backtick (`)** — confirmed in-game. It is **not bound on
+  GAME or GAMENUM**, and Kolter currently plays without keyboard PTT in left-half
+  mode (voice handled off-layer / mouse). Revisit only if keyboard PTT is wanted.
+- **Mouse-bound (not on the keyboard): melee (V), ping (G / middle mouse), and the
+  show-breakable-objects key** — the GAME layer intentionally omits these; don't
+  flag them as missing in coverage reviews.
 
-**Future idea (not now):** consider moving the talk control (push-to-talk, T) to
-the top-left button (pos0), which currently just duplicates TAB (TAB is already on
-physical Q). The pinky can hold pos0 while playing. Deferred.
+**Future idea (not now):** the top-left key (pos0) currently just duplicates TAB
+(TAB is already on physical Q), so it's a spare reachable key — a candidate home if
+a combat key ever needs one (e.g. keyboard PTT). Deferred.
