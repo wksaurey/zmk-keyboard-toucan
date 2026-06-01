@@ -178,74 +178,86 @@ Current behavior:
 
 ## GAME — FPS-style gaming layer
 
-Added in `dff378a` and polished in `0c30f4c`. ESDF replaces WASD,
-with mods on the pinky column. Recovered game keys are remapped so
-common FPS bindings (Q/W/E/R/F, M, R-as-reload) stay reachable.
+Added in `dff378a`, polished in `0c30f4c`, reworked for Z/X/C and
+left-home CTRL/SHIFT in `09a6afd`. The alpha block is shifted one
+column right of BASE, so the physical ESDF cluster produces WASD
+movement; dedicated CTRL and SHIFT sit on the two left home-column
+keys (plain `&kp`, not mod-taps — no hold-tap latency in-game).
+
+This is a **left-half-only** layer: during play the split's right
+half is physically detached for mouse room (see CLAUDE.md). Right-half
+keys are `&trans`; the one live right-half key is the `&tog GAME` exit
+on the inner right thumb.
 
 ### Enter / exit
 
 - **Enter:** activate ADJ (hold both inner thumbs), tap middle-row
-  col 5 (G position) → display shows "GAME".
-- **Exit:** tap right inner thumb (single tap of `&tog GAME` bound
-  directly inside GAME). Display returns to "BASE".
-- The ADJ-G path **does not** exit GAME because layer 4 (GAME)
-  outranks layer 3 (ADJ) and overrides pos 17 with `&kp F` — so the
-  exit is on the inner thumb on purpose.
+  col 5 (physical G) → display shows "GAME".
+- **Exit:** re-dock the right half, tap the **inner right thumb**
+  (`&tog GAME`, bound directly in GAME). Display returns to "BASE".
+- The ADJ-G path **does not** exit GAME: layer 4 (GAME) outranks
+  layer 3 (ADJ) and binds pos 17 to `&kp F`, so the exit lives on the
+  inner thumb on purpose — and can't be hit mid-game because the right
+  half is detached.
 
 ### Movement and mods
 
-- Slide your hand one column right of WASD home. Index/middle/ring
-  fingers should rest on F/D/S.
-- Press E (top, middle finger) → host receives W.
-- Press S (home, ring) → host receives A.
-- Press D (home, middle) → host receives S.
-- Press F (home, index) → host receives D.
-- Press A (home, pinky) → host receives LSHIFT (sprint).
-- Press Z (bottom, pinky) → host receives LCTRL (crouch).
-- Press left-middle thumb → host receives SPACE (jump).
+Rest your left hand one column right of WASD home (index/middle/ring
+on F/D/S). Outputs below are what the host receives:
 
-### Recovered game keys
+- Physical E (top, middle) → W (forward).
+- Physical S (home, ring) → A (left).
+- Physical D (home, middle) → S (back).
+- Physical F (home, index) → D (right).
+- Physical A (home, pinky) → LSHIFT (sprint).
+- Physical Ctrl/Caps key (home, outer pinky) → LCTRL (crouch).
+- Left-middle thumb → SPACE (jump).
 
-These are mapped because the ESDF shift displaces the original
-QWERTY positions:
+### Direct + recovered game keys
 
-- Q position → host receives TAB (scoreboard/inventory).
-- W position → host receives Q.
-- R position → host receives E.
-- T position → host receives R (reload).
-- G position → host receives F.
-- B position → host receives M.
+The one-column shift means several physical keys send a different
+keycode; Z/X/C were added back at their BASE positions in `09a6afd`:
 
-### Pass-through keys
-
-These fall through to BASE and arrive unchanged at the host: TAB,
-LCTRL/CAPS (left outer home), LSHFT (left outer bottom), X, C, V,
-ALT (left outer thumb), the entire right half, and the right-outer
-thumb (RGUI/Super).
+- Physical Z → Z, X → X, C → C (direct — common game binds).
+- Physical Q → TAB (scoreboard/inventory).
+- Physical W → Q.
+- Physical R → E.
+- Physical T → R (reload).
+- Physical G → F (use/interact).
+- Physical V → G.
+- Physical B → M.
+- Physical TAB key (top, outer) → ESC (see below).
+- Physical LShift key (bottom, outer) → RET (enter).
 
 ### ESC
 
-ESC is not directly bound on GAME. Tap the left outer home-row key
-(physical Caps Lock position) → falls through to BASE's
-`&mt LCTRL CAPS` → tap fires CAPS → OS-level Caps→Esc swap delivers
-ESC. There is a ~200ms tap-vs-hold disambiguation latency; fine for
-menu transitions, not snappy.
+ESC is bound **directly**: the top-outer key (physical TAB position)
+sends ESC — no fall-through, no Caps-swap latency. (The older
+Caps-Lock-tap route is gone; that key, the left-outer home, is now a
+direct `&kp LCTRL`.)
 
-## NUMGAME — held weapon-switch sublayer
+### Pass-through keys
 
-Held by the left inner thumb (`&mo NUMGAME`, defined in `0c30f4c`).
-Numbers stay live only while the thumb is held; release returns to
-GAME. The middle row's letter bindings (A=Shift, S/D/F=movement,
-G=F) are overridden by numbers while held — weapon-switch is a
-deliberate pause action so this is acceptable.
+These carry no GAME binding and fall through to BASE: the left-outer
+thumb (→ LALT), the right-outer thumb (→ RGUI/Super), and the entire
+right half. Note the left-outer *home* key is no longer pass-through —
+it is a direct `&kp LCTRL` now.
 
-- Hold left inner thumb. Display does not change layer name (GAME
-  is still shown because NUMGAME shares display).
-- Top row left half: Q→1, W→2, E→3, R→4, T→5.
-- Middle row left half: A→6, S→7, D→8, F→9, G→0.
-- Bottom row left half: pass-through to GAME (LCTRL on Z, etc.).
-- Right half: all pass-through to GAME (which mostly falls through
-  to BASE).
+## GAMENUM — held weapon-switch sublayer
+
+Held by the left inner thumb (`&mo GAMENUM`). Numbers stay live only
+while the thumb is held; release returns to GAME. The home-row letters
+(A→sprint, S/D/F→movement, G→use) are overridden by numbers while
+held — weapon-switch is a deliberate pause action, so that's
+acceptable.
+
+- Hold left inner thumb. (Display: layer GAMENUM becomes active;
+  confirm on-device whether the OLED shows "GAMENUM" or stays "GAME".)
+- Top row left half: physical Q→1, W→2, E→3, R→4, T→5.
+- Middle row left half: physical A→6, S→7, D→8, F→9, G→0.
+- Bottom row: physical X → T (the T displaced from GAME by X, added
+  in `09a6afd`); Z/C and the rest of the row fall through to GAME.
+- Right half: pass-through to GAME (itself `&trans` → BASE).
 
 ## Touchpad
 
