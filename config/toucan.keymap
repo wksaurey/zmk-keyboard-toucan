@@ -120,10 +120,10 @@
         game {
             display-name = "GAME";
             bindings = <
-                &kp ESC   &kp TAB   &kp Q  &kp W  &kp E     &kp R    &trans &trans &trans &trans &trans &trans
-                &kp LCTRL &kp LSHFT &kp A  &kp S  &kp D     &kp F    &trans &trans &trans &trans &trans &trans
-                &kp RET   &kp Z     &kp X  &kp C  &kp G     &kp M    &trans &trans &trans &trans &trans &trans
-                                           &trans &kp SPACE &mo GAMENUM   &tog GAME &trans &trans
+                &trans    &kp TAB   &kp Q  &kp W  &kp E     &kp R    &trans &trans &trans &trans &trans &trans
+                &kp ESC   &kp LSHFT &kp A  &kp S  &kp D     &kp F    &trans &trans &trans &trans &trans &trans
+                &kp RET   &kp LCTRL &kp Z  &kp X  &kp C     &kp M    &trans &trans &trans &trans &trans &trans
+                                           &kp LALT &kp SPACE &mo GAMENUM   &tog GAME &trans &trans
             >;
         };
 
@@ -132,7 +132,7 @@
             bindings = <
                 &trans    &kp N1    &kp N2 &kp N3 &kp N4    &kp N5   &trans &trans &trans &trans &trans &trans
                 &trans    &kp N6    &kp N7 &kp N8 &kp N9    &kp N0   &trans &trans &trans &trans &trans &trans
-                &trans    &trans    &kp T  &trans &trans    &trans   &trans &trans &trans &trans &trans &trans
+                &trans    &trans    &trans &trans &kp G     &kp T    &trans &trans &trans &trans &trans &trans
                                            &trans &trans    &trans   &trans &trans &trans
             >;
         };
