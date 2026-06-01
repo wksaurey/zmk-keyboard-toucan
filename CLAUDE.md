@@ -36,10 +36,10 @@ Example:
 
 ```
 GAME (4)            — left-half-only (right half detached during play)
-  ESC    TAB    Q      W   E   R
-  LCTRL  LSHFT  A      S   D   F
-  RET    Z      X      C   G   M
-         thumbs:  trans   SPACE   MO(GAMENUM)
+  trans  TAB    Q      W   E   R
+  ESC    LSHFT  A      S   D   F
+  RET    LCTRL  Z      X   C   M
+         thumbs:  LALT   SPACE   MO(GAMENUM)
   exit:  TOG(GAME) on the inner right thumb — re-dock right half to return to work
 ```
 

@@ -178,11 +178,12 @@ Current behavior:
 
 ## GAME — FPS-style gaming layer
 
-Added in `dff378a`, polished in `0c30f4c`, reworked for Z/X/C and
-left-home CTRL/SHIFT in `09a6afd`. The alpha block is shifted one
-column right of BASE, so the physical ESDF cluster produces WASD
-movement; dedicated CTRL and SHIFT sit on the two left home-column
-keys (plain `&kp`, not mod-taps — no hold-tap latency in-game).
+Added in `dff378a`, polished in `0c30f4c`, and reworked since for the
+Z/X/C row, a bottom-row crouch, and an outer-pinky ESC. The alpha block
+is shifted one column right of BASE, so the physical ESDF cluster
+produces WASD movement. SHIFT (sprint) sits on the home row; CTRL
+(crouch) is on the bottom-row pinky; ESC is on the outer home pinky.
+All are plain `&kp` (not mod-taps — no hold-tap latency in-game).
 
 This is a **left-half-only** layer: during play the split's right
 half is physically detached for mouse room (see CLAUDE.md). Right-half
@@ -210,38 +211,38 @@ on F/D/S). Outputs below are what the host receives:
 - Physical D (home, middle) → S (back).
 - Physical F (home, index) → D (right).
 - Physical A (home, pinky) → LSHIFT (sprint).
-- Physical Ctrl/Caps key (home, outer pinky) → LCTRL (crouch).
-- Left-middle thumb → SPACE (jump).
+- Physical Z (bottom, pinky) → LCTRL (crouch).
+- Physical Ctrl/Caps key (home, outer pinky) → ESC.
+- Left-outer thumb → LALT. Left-middle thumb → SPACE (jump).
 
 ### Direct + recovered game keys
 
 The one-column shift means several physical keys send a different
-keycode; Z/X/C were added back at their BASE positions in `09a6afd`:
+keycode:
 
-- Physical Z → Z, X → X, C → C (direct — common game binds).
+- Physical X → Z, C → X, V → C (the Z/X/C row, shifted one right).
 - Physical Q → TAB (scoreboard/inventory).
 - Physical W → Q.
 - Physical R → E.
 - Physical T → R (reload).
 - Physical G → F (use/interact).
-- Physical V → G.
 - Physical B → M.
-- Physical TAB key (top, outer) → ESC (see below).
+- Physical TAB key (top, outer) → TAB (fall-through to BASE).
 - Physical LShift key (bottom, outer) → RET (enter).
 
 ### ESC
 
-ESC is bound **directly**: the top-outer key (physical TAB position)
-sends ESC — no fall-through, no Caps-swap latency. (The older
-Caps-Lock-tap route is gone; that key, the left-outer home, is now a
-direct `&kp LCTRL`.)
+ESC is bound **directly** on the outer home-row pinky (physical
+Ctrl/Caps position) — plain `&kp ESC`, no fall-through, no Caps-swap
+latency. (The top-outer key, which previously held ESC, now falls
+through to BASE and sends TAB.)
 
 ### Pass-through keys
 
-These carry no GAME binding and fall through to BASE: the left-outer
-thumb (→ LALT), the right-outer thumb (→ RGUI/Super), and the entire
-right half. Note the left-outer *home* key is no longer pass-through —
-it is a direct `&kp LCTRL` now.
+These carry no GAME binding and fall through to BASE: the right-outer
+thumb (→ RGUI/Super), the top-outer key (→ TAB), and the entire right
+half. The left-outer thumb is now an explicit `&kp LALT`, not a
+fall-through.
 
 ## GAMENUM — held weapon-switch sublayer
 
@@ -255,8 +256,9 @@ acceptable.
   confirm on-device whether the OLED shows "GAMENUM" or stays "GAME".)
 - Top row left half: physical Q→1, W→2, E→3, R→4, T→5.
 - Middle row left half: physical A→6, S→7, D→8, F→9, G→0.
-- Bottom row: physical X → T (the T displaced from GAME by X, added
-  in `09a6afd`); Z/C and the rest of the row fall through to GAME.
+- Bottom row: physical V → G and physical B → T (G and T recovered
+  here after the GAME-layer Z/X/C shift displaced them); the rest of
+  the row falls through to GAME.
 - Right half: pass-through to GAME (itself `&trans` → BASE).
 
 ## Touchpad
