@@ -171,6 +171,10 @@ Current behavior:
 - F-keys on the left hand: F1–F10 + F12 (11 keys). F11 was displaced
   from middle-row col 5 by `&tog GAME` (commit `dff378a`).
 - Vol-down / mute / vol-up on the right home row.
+- Top-row col 10 (physical P position) → `&kp PSCRN` — Print Screen.
+  Mnemonic: "P for print." Confirm it triggers the host screenshot
+  action (Windows: clipboard capture; Linux: whatever the DE binds to
+  PrtSc).
 - Confirm TAB on top-row col 0 of ADJ now actually emits Tab. (Fixed
   in `52895bc` — was `&mo TAB` which is invalid.)
 - ADJ middle-row col 5 (G position) → `&tog GAME` — toggles into the
