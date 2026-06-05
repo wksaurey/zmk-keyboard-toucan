@@ -129,7 +129,7 @@ wire from pad to pad.
 - **Cracked trace** — rare without obvious physical trauma. Look for
   pinches near the case mounting points.
 
-## Right-half lockup — pending diagnostics
+## Right-half lockup — firmware confirmed alive; cause is the split BLE link
 
 The right half occasionally hangs during continuous trackpad use (whole
 half: keys + trackpad stop, requires power-cycle to recover). Prior
@@ -139,6 +139,20 @@ permanently. Next failure observed 2026-05-27 12:53:00 during cursor
 use, battery ~50% (brown-out ruled out). Diagnostics plan below; the
 config-side bits live in `boards/shields/toucan/toucan_right.conf`,
 and the console plumbing is wired via a snippet in `build.yaml`.
+
+> **STATUS 2026-06-04 — caught it live; firmware is NOT the problem.**
+> Captured the lockup over the USB CDC console while it was happening:
+> the thread-analyzer dump kept advancing for 4+ minutes during the hang
+> (idle thread + others ticking up), with no panic and no `STACK_SENTINEL`
+> trip. The right-half firmware core was **alive the whole time** — keys +
+> trackpad were simply not reaching the host. That **confirms the "Firmware
+> alive, BLE link dropped" branch** of §2 below and **rules out** firmware
+> crash, stack overflow, and a cirque-SPI-only hang. The dead segment is the
+> right↔left split BLE link; the hang did **not** self-recover without a
+> power cycle. Open question — *why* the link drops (clean supervision
+> timeout vs. a wedged BLE thread) — is what the follow-up logging (named
+> threads + `BT_HCI_CORE`/`BT_CONN` debug logging, added to
+> `toucan_right.conf` on 2026-06-04) is meant to answer on the next capture.
 
 **Diagnose first, then aim.** The watchdog approach in an earlier
 draft of this plan (`CONFIG_WDT=y`, `CONFIG_ZMK_BEHAVIORS_WATCHDOG=y`)
@@ -164,10 +178,13 @@ Only useful if the cause IS stack overflow. With stacks already at
 in or out. **Useless without #2** (a console to read the panic);
 without it, a sentinel-triggered halt looks identical to a hang.
 
-(Not adding `CONFIG_THREAD_ANALYZER`: it only emits output when
+(~~Not adding `CONFIG_THREAD_ANALYZER`: it only emits output when
 something calls `thread_analyzer_run()` — ZMK doesn't, and we have no
 `CONFIG_THREAD_ANALYZER_AUTO` interval set. It's compiled-in
-dead-weight without one of those.)
+dead-weight without one of those.~~ **Reversed:** `THREAD_ANALYZER` +
+`THREAD_ANALYZER_AUTO` (5 s interval) + `THREAD_ANALYZER_USE_PRINTK`
+*were* added — the periodic auto-dump is precisely the heartbeat that
+proved the firmware stays alive during the hang. See `toucan_right.conf`.)
 
 ### 2. USB CDC console — read what the right half is doing
 
@@ -196,14 +213,18 @@ failure modes that all *look* identical from the host's perspective:
 
 - **Firmware crashed** (stack overflow, mutex deadlock, ISR storm) —
   CDC console either doesn't enumerate, or prints a panic on connect.
+  *(2026-06-04: ruled out — see STATUS above.)*
 - **Firmware alive, BLE link dropped** — CDC console enumerates and
   prints normally. Diagnostic attention moves to the radio side
   (BLE state machine, peripheral-central pairing); the firmware
-  isn't the problem.
+  isn't the problem. **← CONFIRMED 2026-06-04.** The live tell is the
+  thread-analyzer counters still advancing during the hang.
 - **SPI bus to cirque is stuck** — CDC enumerates but logs show the
   cirque driver thread last-alive timestamp frozen. (Cirque on
   Toucan is on `spi0` per `toucan_right.overlay`, not I²C; the XIAO
   I²C controller is disabled on this shield.)
+  *(2026-06-04: ruled out — keys died too, not just the trackpad, so
+  the whole right→host path is down, not just the cirque bus.)*
 
 **Heisenbug caveat:** always-on USB changes scheduler load, ISR
 cadence, and idle/sleep behavior. If the lockup *stops* reproducing
@@ -251,6 +272,17 @@ When the right half locks up, the goal is to read the kernel log
 and the capture. The log buffer lives in RAM. Toggling the slide
 switch off (or letting the battery die) wipes it.
 
+**Better still — connect the console BEFORE it locks up.** Now that the
+firmware is confirmed alive during the hang (STATUS above), the prize is
+the *disconnect event itself* (reason code from `BT_HCI_CORE`/`BT_CONN`
+logging), and that only prints at the instant the link drops. On
+2026-06-04 we connected *after* the lockup and the event had already
+scrolled out of the small ringbuf — so we proved firmware-alive but
+missed *why* the link dropped. Going forward, work/game with USB-C in the
+right half and PuTTY already logging to a file, and let it run until the
+hang reproduces. The post-lockup procedure below is the fallback for when
+you weren't already connected.
+
 #### Procedure
 
 1. Lockup happens → note the time and what you were doing. Don't
@@ -295,7 +327,7 @@ within a couple minutes" and you cover both.
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | `E: ***** USAGE FAULT *****` / `>>> ZEPHYR FATAL ERROR 2`             | Stack overflow (FATAL ERROR 2). "Current thread" names the failing stack.                 |
 | Other `>>> ZEPHYR FATAL ERROR N`                                      | Other kernel panic — hardfault, mutex deadlock detector, etc. Code identifies the class.  |
-| Live heartbeat / normal log lines, no panic                           | Firmware never died. Failure is on the BLE link side, not the firmware.                   |
+| Thread-analyzer counters still advancing during the hang, no panic    | **Firmware alive — confirmed case (2026-06-04).** The hang is the split BLE link, not the firmware. Look for a `BT_CONN`/`BT_HCI_CORE` "Disconnected (reason 0x..)" line for the cause. |
 | CDC enumerates but port is silent                                     | Firmware halted before logging, or HardFault took down output before flush.               |
 | No enumeration at all                                                 | USB stack itself is dead. HardFault, MPU fault, or hardware-level issue.                  |
 
