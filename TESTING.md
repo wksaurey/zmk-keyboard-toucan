@@ -30,8 +30,13 @@ ambiguous. Flag anything that doesn't behave as expected.
 - Hold the new bottom-right RSHFT, type `a`. Should produce `A`.
 - Press LSHFT + RSHFT simultaneously. Produces ESC keycode → toggles
   CAPS LOCK at the host (OS-level esc/caps swap). The combo has a
-  2000 ms window after a 100 ms idle gate, so it does **not** fire
-  while typing flow — pause briefly first, then chord.
+  50 ms window after a 100 ms idle gate, so it does **not** fire
+  while typing flow — pause briefly first, then chord both shifts fast.
+- After a pause, hold LSHFT and shift-click / shift-drag with the mouse.
+  The selection must extend on the **first** click — no missed/dropped
+  shift. (Combo withholds the shift press only ~50 ms before flushing;
+  a mouse click can't break the combo since it's a separate USB device,
+  so a long combo window here would silently swallow held-shift+click.)
 
 ## BASE — cut / copy / paste combos
 
