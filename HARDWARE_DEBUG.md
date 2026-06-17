@@ -154,6 +154,37 @@ and the console plumbing is wired via a snippet in `build.yaml`.
 > threads + `BT_HCI_CORE`/`BT_CONN` debug logging, added to
 > `toucan_right.conf` on 2026-06-04) is meant to answer on the next capture.
 
+> **STATUS 2026-06-09 — the `c205b8c` diag build BRICKS the right half's
+> boot. Do NOT flash it.** Flashing the main-branch CI artifact (run
+> `27004601648`, the only build containing the `CONFIG_THREAD_NAME` +
+> `BT_HCI_CORE`/`BT_CONN` debug flags) left the right half dead: USB
+> enumeration fails ("device descriptor request failed" on every reset),
+> no split link, appears off on battery — only the dim CH charge LED.
+> The app crashes/hangs during early boot, almost certainly the BT host's
+> debug-log flood at init; even per-module DBG was too much. Recovered via
+> double-tap DFU (bootloader survives — pulsing red USR LED + `XIAO-SENSE`
+> drive) and reflashing the known-good branch build.
+>
+> **FIXED 2026-06-16.** The two boot-breaking flags
+> (`CONFIG_BT_HCI_CORE_LOG_LEVEL_DBG` + `CONFIG_BT_CONN_LOG_LEVEL_DBG`) were
+> removed from `toucan_right.conf` — *not* via a full `git revert c205b8c`,
+> which would also have dropped `CONFIG_THREAD_NAME`. `THREAD_NAME` is kept:
+> it isn't the boot-breaker (small RAM, no behavior change) and it labels
+> threads in the analyzer dump. Main CI artifacts boot the right half again.
+>
+> **The flags were also unnecessary.** ZMK v0.3's split peripheral
+> (`app/src/split/bluetooth/peripheral.c`) already logs
+> `Disconnected from <addr> (reason 0x%02x)` at `LOG_DBG` in the `zmk`
+> log module — which the `zmk-usb-logging` snippet already enables
+> (every capture shows `<dbg> zmk:` lines). The reason byte prints on the
+> **current known-good firmware**; no rebuild needed. What the 2026-06-04
+> and 2026-06-09 captures were missing was not logging but *attachment*:
+> both connected after the drop, and the line had scrolled out of the 8 KB
+> ringbuf. Capture plan: PuTTY pre-attached and logging from boot, then
+> grep the log for `reason 0x`. (2026-06-09 capture re-confirmed
+> firmware-alive: ~20 analyzer blocks advancing, no panic, uptime 00:14 at
+> capture start.)
+
 **Diagnose first, then aim.** The watchdog approach in an earlier
 draft of this plan (`CONFIG_WDT=y`, `CONFIG_ZMK_BEHAVIORS_WATCHDOG=y`)
 turned out to be wrong on two counts: the parent symbol is
@@ -274,8 +305,11 @@ switch off (or letting the battery die) wipes it.
 
 **Better still — connect the console BEFORE it locks up.** Now that the
 firmware is confirmed alive during the hang (STATUS above), the prize is
-the *disconnect event itself* (reason code from `BT_HCI_CORE`/`BT_CONN`
-logging), and that only prints at the instant the link drops. On
+the *disconnect event itself* — ZMK's own
+`Disconnected from <addr> (reason 0x..)` line, logged at `zmk` DBG level
+by the split peripheral on the current firmware (no extra Kconfig
+needed; the `BT_HCI_CORE`/`BT_CONN` debug flags turned out to brick boot
+— see STATUS 2026-06-09). It only prints at the instant the link drops. On
 2026-06-04 we connected *after* the lockup and the event had already
 scrolled out of the small ringbuf — so we proved firmware-alive but
 missed *why* the link dropped. Going forward, work/game with USB-C in the
@@ -327,7 +361,7 @@ within a couple minutes" and you cover both.
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | `E: ***** USAGE FAULT *****` / `>>> ZEPHYR FATAL ERROR 2`             | Stack overflow (FATAL ERROR 2). "Current thread" names the failing stack.                 |
 | Other `>>> ZEPHYR FATAL ERROR N`                                      | Other kernel panic — hardfault, mutex deadlock detector, etc. Code identifies the class.  |
-| Thread-analyzer counters still advancing during the hang, no panic    | **Firmware alive — confirmed case (2026-06-04).** The hang is the split BLE link, not the firmware. Look for a `BT_CONN`/`BT_HCI_CORE` "Disconnected (reason 0x..)" line for the cause. |
+| Thread-analyzer counters still advancing during the hang, no panic    | **Firmware alive — confirmed case (2026-06-04, re-confirmed 2026-06-09).** The hang is the split BLE link, not the firmware. Look for ZMK's `<dbg> zmk: ... Disconnected from <addr> (reason 0x..)` line for the cause — present on current firmware, but only if the console was attached when the link dropped. |
 | CDC enumerates but port is silent                                     | Firmware halted before logging, or HardFault took down output before flush.               |
 | No enumeration at all                                                 | USB stack itself is dead. HardFault, MPU fault, or hardware-level issue.                  |
 
