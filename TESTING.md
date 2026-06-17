@@ -25,18 +25,27 @@ ambiguous. Flag anything that doesn't behave as expected.
 - Tap once. Should act as Esc (OS-level caps→esc remap).
 - Hold + press `c`. Should produce Ctrl+C.
 
-## BASE — RSHFT and combo
+## BASE — RSHFT and dual-shift caps (mod-morph)
 
-- Hold the new bottom-right RSHFT, type `a`. Should produce `A`.
-- Press LSHFT + RSHFT simultaneously. Produces ESC keycode → toggles
-  CAPS LOCK at the host (OS-level esc/caps swap). The combo has a
-  50 ms window after a 100 ms idle gate, so it does **not** fire
-  while typing flow — pause briefly first, then chord both shifts fast.
-- After a pause, hold LSHFT and shift-click / shift-drag with the mouse.
-  The selection must extend on the **first** click — no missed/dropped
-  shift. (Combo withholds the shift press only ~50 ms before flushing;
-  a mouse click can't break the combo since it's a separate USB device,
-  so a long combo window here would silently swallow held-shift+click.)
+Both outer pinky keys are `mod-morph` behaviors (not a combo): each sends
+its shift immediately, but morphs to ESC if the *other* shift is already
+held. ESC → CAPS LOCK at the host (OS-level esc/caps swap).
+
+- Hold LSHFT, type `a` → `A`. Hold the bottom-right RSHFT, type `a` → `A`.
+  Each shift must register on the **first** keypress, no delay.
+- Hold LSHFT, then (still holding) press RSHFT → toggles CAPS LOCK.
+  Then the reverse: hold RSHFT first, then press LSHFT → also toggles
+  CAPS LOCK. Order-independent; whichever shift is pressed *second*
+  produces the caps toggle.
+- Hold LSHFT and shift-click / shift-drag with the mouse. The selection
+  must extend on the **first** click — no missed/dropped shift. (This is
+  the bug the mod-morph fixes: shift is never withheld, so a separate-USB
+  mouse click can't be swallowed waiting on a combo window.)
+- **Verify the morph emits a clean ESC:** when the second shift toggles
+  caps, confirm CAPS LOCK actually flips at the host. If it doesn't, the
+  first shift's modifier may be leaking through (host sees Shift+ESC, not
+  ESC) and the ESC→Caps remap isn't firing — see the mod-morph note in
+  `config/toucan.keymap`.
 
 ## BASE — cut / copy / paste combos
 
