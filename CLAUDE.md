@@ -26,6 +26,12 @@ Our copy predates upstream's 2026-02-16 API rename
 main and would break our v0.3 build if pulled today — but becomes REQUIRED
 whenever we rebase to ZMK ≥0.4. Check that repo only when planning the rebase.
 
+Watch item: Kolter ordered beekeeb's Azoteq TPS43 upgrade kit (ships
+late-Jul/Aug 2026) — full prep, integration map, and the
+blocked-on-beekeeb re-check list live in `AZOTEQ_UPGRADE.md`. The upgrade
+is explicitly reversible (he may prefer the Cirque); keep both trackpad
+configs buildable.
+
 Watch item: beekeeb announced two NEW Toucan display options (WPM pixel
 graph + 1-bit pixel-art toucan icon, compile-time selectable) in the
 2026-06-04 "Introducing Toucan2" blog post — Kolter wants these. As of
