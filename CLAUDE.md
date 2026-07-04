@@ -3,6 +3,28 @@
 ZMK config for the toucan split keyboard. The keymap lives at
 `config/toucan.keymap`. Layers: `BASE(0) NAV(1) SYM(2) ADJ(3) GAME(4) GAMENUM(5)`.
 
+## Session start — offer the upstream check
+
+At the start of each session in this repo, ask Kolter whether to run the
+upstream check: search `beekeeb/zmk-keyboard-toucan`,
+`geeksville/cirque-input-module`, and `zmkfirmware/zmk` for issues / PRs /
+commits updated since the last check that touch split lockups, input relay,
+central stacks, or the cirque driver. Public repos — `gh`/web search, no auth.
+
+Baseline as of 2026-07-04: beekeeb PR #19 merged (central
+`INPUT_THREAD_STACK_SIZE` fix — deployed here), PR #20/#24 closed-unmerged,
+`cirque-input-module` PR #4 (`K_NO_WAIT`) and #5 OPEN — **our `west.yml` pins
+PR #4's head SHA `00a4a28`, so its fate matters** (merge/rebase/supersede →
+repin), beekeeb issue #23 open (CS-line `GPIO_PULL_UP`, not our bug). Report
+only movement against this baseline, and update this section's baseline after
+each check.
+
+Why this exists: the July-2026 lockup root cause sat in an upstream PR for a
+month while we instrumented from scratch — a one-shot "upstream has nothing"
+check went stale (see `.claude/retro.md` 2026-07-04). Retire this section
+once the fix has soaked clean for a month or two AND cirque #4 has landed
+somewhere permanent.
+
 ## Which keymap is authoritative
 
 There are **two** keymap files — edit only the first:
