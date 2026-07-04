@@ -16,11 +16,15 @@ manifest:
       import: app/west.yml
     - name: cirque-input-module
       remote: geeksville
-      # Pinned to a verified-good commit (includes the late-Jan-2026
-      # interrupt-handling fixes: level-triggered IRQs + extra ZIDLE
-      # IRQs to protect against missed interrupts). The toucan branch
-      # is otherwise a moving target.
-      revision: effec100f0cd3a38e7fba3adfea394586cc84cab
+      # Pinned to the K_NO_WAIT fix (geeksville PR #4, open, 2026-07-04):
+      # the driver reported input with K_FOREVER on the system workqueue,
+      # so a congested split link filled the input queue and wedged the
+      # peripheral's sysworkq forever (kscan/battery/split TX all stall,
+      # firmware alive, no panic — the May/July right-half "goes dark"
+      # mode). This commit's parent is our previous pin effec100f0cd
+      # (late-Jan-2026 IRQ fixes), so it's a clean fast-forward that
+      # keeps those. PR head, not on the toucan branch — pin the SHA.
+      revision: 00a4a28604ff60d30492184262ed9fdf81def7a9
     - name: zmk-rgbled-widget
       remote: caksoylar
       revision: v0.3
