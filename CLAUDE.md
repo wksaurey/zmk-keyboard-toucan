@@ -26,6 +26,15 @@ Our copy predates upstream's 2026-02-16 API rename
 main and would break our v0.3 build if pulled today — but becomes REQUIRED
 whenever we rebase to ZMK ≥0.4. Check that repo only when planning the rebase.
 
+Watch item: beekeeb announced two NEW Toucan display options (WPM pixel
+graph + 1-bit pixel-art toucan icon, compile-time selectable) in the
+2026-06-04 "Introducing Toucan2" blog post — Kolter wants these. As of
+2026-07-04 no code is public (their `zmk-keyboard-displaydemo` repo is a
+generic sprite demo, not the Toucan screens); expected around the Toucan2
+ship date, late July 2026. When it lands, evaluate vendoring into
+`boards/shields/nice_view_gem/` (same XIAO + nice!view stack, likely
+portable to Toucan1).
+
 Why this exists: the July-2026 lockup root cause sat in an upstream PR for a
 month while we instrumented from scratch — a one-shot "upstream has nothing"
 check went stale (see `.claude/retro.md` 2026-07-04). Retire this section
