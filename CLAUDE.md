@@ -19,6 +19,13 @@ repin), beekeeb issue #23 open (CS-line `GPIO_PULL_UP`, not our bug). Report
 only movement against this baseline, and update this section's baseline after
 each check.
 
+Display note: the screen UI (`boards/shields/nice_view_gem/`) is a VENDORED,
+beekeeb-modified copy of `M165437/nice-view-gem` — it never updates via west.
+Our copy predates upstream's 2026-02-16 API rename
+(`zmk_endpoints_selected` → `zmk_endpoint_get_selected`), which targets ZMK
+main and would break our v0.3 build if pulled today — but becomes REQUIRED
+whenever we rebase to ZMK ≥0.4. Check that repo only when planning the rebase.
+
 Why this exists: the July-2026 lockup root cause sat in an upstream PR for a
 month while we instrumented from scratch — a one-shot "upstream has nothing"
 check went stale (see `.claude/retro.md` 2026-07-04). Retire this section
