@@ -185,6 +185,163 @@ and the console plumbing is wired via a snippet in `build.yaml`.
 > firmware-alive: ~20 analyzer blocks advancing, no panic, uptime 00:14 at
 > capture start.)
 
+> **STATUS 2026-07-03 — GOT THE REASON BYTE: `0x08` connection supervision
+> timeout.** Captured live with the console attached before the drop (lockup
+> at 14:47:11 during continuous trackpad use, no host-switching involved).
+> Full sequence from the right half's log:
+>
+> 1. `<wrn> bt_att: Not connected` — the peripheral was mid-send (cursor
+>    traffic) when the ATT layer found the link already dead.
+> 2. `Disconnected from ED:D4:95:87:0F:D1 (reason 0x08)` — supervision
+>    timeout: the **central (left half) went silent on the radio**; nobody
+>    deliberately disconnected (that would be 0x13/0x16).
+> 3. **26 ms later: full automatic reconnect** — `Peripheral connected`,
+>    security level 2 restored, both split CCCs re-subscribed, physical
+>    layout re-selected via GATT write. The BLE link healed itself
+>    essentially instantly.
+> 4. Post-reconnect, the right half kept scanning and sending key events
+>    normally (test presses visible in the log).
+>
+> Additional finding, an accident of USB power: the user's recovery
+> "power-cycle" of the right half **did not actually reset it** — firmware
+> uptime ran continuously through the whole episode, because **the slide
+> switch only disconnects the battery; USB VBUS keeps the MCU running**.
+> Function returned anyway. So the right half needed no reset at all,
+> which — combined with the instant reconnect and reason 0x08 — shifts
+> prime suspicion to the **left half (split central)**: it stops
+> responding on the radio long enough to kill the link, its BT stack
+> recovers the connection immediately, and whether right-half input
+> reaches the host afterward is the open question (perceived deadness vs.
+> log-confirmed sends is unresolved — see next steps).
+>
+> Capture rig (all on the Windows side, C:\Temp): `toucan-serial-logger.ps1`
+> (auto-reconnecting CDC reader → timestamped `toucan-console.log`) managed
+> by `toucan-logger-watchdog.ps1` (force-restarts the reader if the log goes
+> stale while the port is enumerated — a blocked serial read once silently
+> ate 40 min of stream, so the watchdog is not optional). Reader gotchas
+> fixed along the way: .NET regex `.` doesn't match newlines (multi-line
+> chunks jammed the line splitter), and `ReadExisting()` can block forever
+> on a wedged/suspended usbser handle (gate on `BytesToRead`).
+>
+> (2026-07-03, later:) recovery that day turned out to be a bundle — right
+> switch flip (no-op under USB power), LEFT half power-cycle (a real reset),
+> and a host move — so which action restored function is confounded, and
+> whether the auto-reconnect alone had already restored it is unknown.
+>
+> **NEXT-LOCKUP PROTOCOL (in order, touching nothing else):**
+> 1. Hands off. Note the time. The disconnect line is already captured.
+> 2. Wait ~15 s (give the auto-reconnect time), then test: move the
+>    trackpad, type a few right-half keys somewhere visible. If input
+>    works → the link self-heals and no reset is needed; prior right-half
+>    power-cycle fixes were placebo. Done.
+> 3. If still dead: power-cycle ONLY the left half. Re-test the right
+>    half. If input returns → central-side wedge confirmed; instrument
+>    the left half next.
+> 4. Only if still dead: reset the right half (unplug its USB first —
+>    the slide switch alone doesn't reset it while the cable is in;
+>    double-tap reset also works).
+> Report which step restored function.
+>
+> **STATUS 2026-07-04 — VERDICT: the LEFT half (split central) is the
+> patient. Protocol ran to completion on a live lockup; right half is
+> exonerated.** Full sequence, all from the right half's console:
+>
+> - Lockup struck during cursor use (~10:15). This time the split link
+>   did NOT drop — no disconnect line, no bt_att errors. The right half
+>   kept scanning and sending key events into a connection the left half
+>   was accepting at the radio level and ignoring at the app level.
+> - ~10:17, the failure CASCADED: the right half's kscan went completely
+>   silent (10 test H-presses at ~10:22 produced zero scan events) while
+>   its firmware stayed alive (analyzer + battery logging normal).
+>   Interpretation: the peripheral's split-TX event queue jammed against
+>   the zombie connection and back-pressured the scan pipeline.
+> - User power-cycled ONLY the left half. The right half held the zombie
+>   connection until supervision timeout (`reason 0x08`, 10:26:23) — the
+>   same byte as 2026-07-03, now understood as "central went silent."
+> - The teardown unjammed the peripheral: 26 ms later it reconnected to
+>   the freshly-booted left half, and 9 s later the user's H-presses were
+>   back in the scan log AND on screen. **Right half was never rebooted**
+>   (uptime continuous through the entire episode).
+>
+> This also reinterprets 2026-07-03: that day's instant auto-reconnect
+> went to a *still-wedged* central, so input stayed dead. Reconnection
+> isn't the cure — a REBOOTED central is. The left half's BT host stack
+> survives the wedge (reconnects + re-subscribes CCCs within ~1 s every
+> time); what hangs is ZMK's split-central input processing above it.
+> Trigger correlates with sustained pointer traffic (high event rate)
+> in every observed instance; keys-only use has never triggered it.
+>
+> Recovery shortcut until fixed: flip the LEFT half's power switch.
+> ~2 s outage, no bond loss, right half recovers on its own.
+>
+> Next steps: (a) research upstream — ZMK issues/PRs for split-central
+> input-relay wedges under pointer load (we pin zmk v0.3 branch +
+> cirque-input-module effec100); (b) instrument the LEFT half the same
+> way as the right (zmk-usb-logging snippet + THREAD_NAME + analyzer on
+> its build entry — the boot-brick flags were the BT DBG pair, NOT these;
+> beware ZMK prefers USB for HID output when a cable is in, so add
+> `&out` toggles to ADJ or unplug after capture) and catch the wedge
+> from the central's side: which thread/queue stalls; (c) fix per
+> findings — queue sizing, ZMK update/patch, or upstream report with
+> the trace; (d) optional stopgap while root-causing: task watchdog on
+> the central to auto-reset on input-thread stall. Superseded plan for
+> reference: (was) if central-side wedge is confirmed,
+> instrument the LEFT half (zmk-usb-logging snippet on its build entry —
+> beware ZMK output routing prefers USB when a cable is attached; force
+> `&out OUT_BLE` or unpair expectations accordingly); (c) correlate lockup
+> frequency with heavy pointer traffic on the split link (matches every
+> observed trigger to date).
+
+> **RESEARCH 2026-07-04 — upstream already found it. Three research
+> streams (beekeeb fork, cirque module + community, ZMK core source),
+> all converging:**
+>
+> 1. **beekeeb PR #19 (MERGED upstream 2026-06-28) — the primary fix.**
+>    Zephyr's input thread defaults to a 512 B stack; on the CENTRAL the
+>    forwarded-trackpad fan-out (split input handler → listeners →
+>    xy-scaler → mouse HID → scroll mapper) peaks at 536 B. Measured on
+>    identical hardware (kalbasit): free space 88→0 in ~90 s of trackpad
+>    use, corruption wedges the relay, eventually kills the split link
+>    with BT_HCI_ERR_CONN_TIMEOUT — our `reason 0x08`, verbatim.
+>    Fix: `CONFIG_INPUT_THREAD_STACK_SIZE` ≥2048 on the central. **Our
+>    fork bumped this on the RIGHT half only (May diagnostics) — the
+>    wrong half.** Explains a permanent wedge (corrupted memory doesn't
+>    self-heal) and why the central's BT stack survives (separate threads).
+> 2. **cirque-input-module PR #4 (`00a4a28`, OPEN, parent = our pin
+>    `effec100`) — the peripheral-side fix.** The Pinnacle driver calls
+>    `input_report_*(…, K_FOREVER)` on the sysworkq; when the split link
+>    congests and the 16-deep input queue (`CONFIG_INPUT_QUEUE_MAX_MSGS`)
+>    fills, the sysworkq blocks forever — kscan, battery, split TX all
+>    stall, firmware alive, no panic. Matches our 2026-07-04 kscan-silence
+>    cascade AND the original May right-half hangs. Fix: `K_NO_WAIT`
+>    (drop under backpressure).
+> 3. **ZMK v0.3 source facts (verified from the tree):** peripheral
+>    pointer events bypass ZMK's queues entirely — `zmk_split_bt_report_input()`
+>    → synchronous `bt_gatt_notify` on the input thread, no backpressure
+>    valve (unchanged on main). Central relay funnels ALL peripheral
+>    events through one 5-deep msgq (`ZMK_SPLIT_BLE_CENTRAL_POSITION_QUEUE_SIZE`,
+>    silent drops). Below ZMK: Zephyr 3.5 BT host has known
+>    notify-TX-credit exhaustion + buffer-leak-on-disconnect bugs
+>    (zephyr#47649, #16803, #28248); ZMK main moved to Zephyr 4.1.
+>    Secondary knobs if needed: `CONFIG_ZMK_SPLIT_BLE_CENTRAL_SPLIT_RUN_STACK_SIZE=4096`
+>    (beekeeb PR #20, measurements disputed), central position-queue bump,
+>    `BT_L2CAP_TX_BUF_COUNT`/`BT_ATT_TX_COUNT`, badjeff's
+>    `zip_report_rate_limit` input processor to throttle at the source.
+>
+> **Fix plan:** (1) `CONFIG_INPUT_THREAD_STACK_SIZE=4096` +
+> `CONFIG_ZMK_SPLIT_BLE_CENTRAL_SPLIT_RUN_STACK_SIZE=4096` + diag block
+> (STACK_SENTINEL/analyzer/THREAD_NAME — currently right-half-only) in
+> `boards/shields/toucan/toucan_left.conf`; (2) move cirque pin
+> `effec100` → `00a4a28` in `config/west.yml`; (3) repair the dangling
+> `config/toucan_{left,right}.conf` symlinks (point at nonexistent
+> `toucan.conf`; contribute nothing to builds). Escalation if lockups
+> persist: Zephyr BT buffer bumps above, then ZMK 0.4/Zephyr-4.1 rebase.
+> Our capture record (0x08 + 26 ms reconnect + live-link variant +
+> teardown-unjam) is an unusually complete repro — worth filing upstream
+> if anything survives the fix. Related, not ours: beekeeb issue #23
+> (`GPIO_PULL_UP` on the Cirque CS line kills the pad outright on some
+> builds — our overlay carries the same line but our pad works).
+
 **Diagnose first, then aim.** The watchdog approach in an earlier
 draft of this plan (`CONFIG_WDT=y`, `CONFIG_ZMK_BEHAVIORS_WATCHDOG=y`)
 turned out to be wrong on two counts: the parent symbol is
