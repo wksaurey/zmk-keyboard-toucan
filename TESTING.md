@@ -168,9 +168,11 @@ Current behavior:
 
 - Activate ADJ (hold both inner thumbs, or toggle one then hold the
   other).
-- F-keys on the left hand: F1–F10 + F12 (11 keys). F11 was displaced
-  from middle-row col 5 by `&tog GAME` (commit `dff378a`).
-- Vol-down / mute / vol-up on the right home row.
+- F-keys on the left hand, cols 1–4, reading order: F1–F4 top row,
+  F5–F8 middle row, F9–F12 bottom row (all 12 — F11 regained when the
+  block shifted left off col 5). Col 5 is `&trans` above and below
+  `&tog GAME`.
+- Vol-down / mute / vol-up on the right top row.
 - Top-row col 10 (physical P position) → `&kp PSCRN` — Print Screen.
   Mnemonic: "P for print." Confirm it triggers the host screenshot
   action (Windows: clipboard capture; Linux: whatever the DE binds to
