@@ -1,0 +1,13 @@
+DT_COMPAT_ZMK_INPUT_PROCESSOR_ACCELERATION := zmk,input-processor-acceleration
+
+config ZMK_INPUT_PROCESSOR_ACCELERATION
+    bool "Velocity-based pointer acceleration input processor"
+    # Gate strictly on the DT node — upstream's extra bare `default y`
+    # compiled this into every build (settings_reset included), which is
+    # half of why the west-module version broke CI.
+    default $(dt_compat_enabled,$(DT_COMPAT_ZMK_INPUT_PROCESSOR_ACCELERATION))
+    depends on ZMK_POINTING
+    depends on INPUT
+    help
+      Velocity-based acceleration for relative pointer input events
+      (vendored from oleksandrmaslov/zmk-pointing-acceleration).

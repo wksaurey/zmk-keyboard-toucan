@@ -1,3 +1,27 @@
+# Vendored drivers & input processors
+
+Two vendored components live here; each keeps its upstream license file
+alongside.
+
+## input_processor/ — pointer acceleration (build glue fixed)
+
+Vendored 2026-08-20 from `oleksandrmaslov/zmk-pointing-acceleration` @
+`0da8f97f` (27★, the most-adopted ZMK accel processor). The west-module
+form broke every CI build it compiled in, for two upstream bugs fixed
+here rather than carried:
+
+- **CMake never adds ZMK's include dir**, so
+  `#include <drivers/input_processor.h>` is unfindable. Fixed with the
+  same `zephyr_library_include_directories(${APPLICATION_SOURCE_DIR}/include)`
+  line the working zmk-input-zoom module uses.
+- **Kconfig had a stray unconditional `default y`**, compiling the
+  processor into builds with no accel DT node (settings_reset died on
+  this). Fixed by gating strictly on `dt_compat_enabled`.
+
+`input_processor_accel.c` itself is byte-identical to upstream; the
+binding lives at `../dts/bindings/zmk,input-processor-acceleration.yaml`.
+Both fixes are upstream-PR candidates.
+
 # Vendored Azoteq TPS43 driver (patched)
 
 Vendored from `geeksville/zmk_driver_azoteq` at master SHA `66d51024`

@@ -1,1 +1,2 @@
 rsource "input/Kconfig"
+rsource "input_processor/Kconfig"
