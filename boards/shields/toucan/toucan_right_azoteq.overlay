@@ -9,6 +9,14 @@
 
 #include "toucan.dtsi"
 
+// xiao_i2c is &i2c1 (P0.04/P0.05 — this overlay's kscan cols 5 and 3),
+// enabled by the board dts; with CONFIG_I2C=y it would instantiate TWIM1
+// and re-claim those pins via pinctrl on any PM resume. Both sibling
+// overlays disable it for the same reason. The trackpad rides &i2c0.
+&xiao_i2c {
+    status = "disabled";
+};
+
 &default_transform {
     col-offset = <6>;
 };
