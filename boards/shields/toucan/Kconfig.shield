@@ -3,3 +3,6 @@ config SHIELD_TOUCAN_LEFT
 
 config SHIELD_TOUCAN_RIGHT
     def_bool $(shields_list_contains,toucan_right)
+
+config SHIELD_TOUCAN_RIGHT_AZOTEQ
+    def_bool $(shields_list_contains,toucan_right_azoteq)

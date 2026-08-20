@@ -107,7 +107,13 @@
         compatible = "zmk,input-listener";
         status = "disabled";
         device = <&glidepoint_split>;
-        input-processors = <&zip_xy_scaler 225 100>;
+        // zip_scroll_scaler: no-op for the cirque (it never emits
+        // REL_WHEEL); scales the azoteq TPS43's two-finger scroll to
+        // beekeeb's reference feel (driver emits at 100%, /20 here — done
+        // central-side so slow scrolls aren't integer-truncated to zero
+        // at the source). Keeps ONE left firmware serving both right
+        // halves.
+        input-processors = <&zip_xy_scaler 225 100>, <&zip_scroll_scaler 1 20>;
         scroller {
             layers = <2>;
             input-processors = <

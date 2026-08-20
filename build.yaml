@@ -26,5 +26,10 @@ include:
   - board: seeeduino_xiao_ble
     shield: toucan_right rgbled_adapter
     snippet: zmk-usb-logging
+  # Toucan2 upgrade-kit right half (Azoteq TPS43). Built ALONGSIDE the
+  # cirque right half — both stay flashable; see AZOTEQ_UPGRADE.md.
+  - board: seeeduino_xiao_ble
+    shield: toucan_right_azoteq rgbled_adapter
+    snippet: zmk-usb-logging
   - board: seeeduino_xiao_ble
     shield: settings_reset

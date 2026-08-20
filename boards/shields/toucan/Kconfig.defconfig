@@ -18,8 +18,13 @@ endif
 
 if SHIELD_TOUCAN_LEFT || SHIELD_TOUCAN_RIGHT
 
+# SPI is only for the cirque pad + nice!view; the azoteq right half is I2C
 config SPI
     default y
+
+endif
+
+if SHIELD_TOUCAN_LEFT || SHIELD_TOUCAN_RIGHT || SHIELD_TOUCAN_RIGHT_AZOTEQ
 
 config ZMK_SPLIT
     default y

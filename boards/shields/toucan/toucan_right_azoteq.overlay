@@ -1,0 +1,107 @@
+// Right half with the Toucan Upgrade Kit's Azoteq TPS43 (IQS550, I2C)
+// in place of the Cirque Pinnacle (SPI). Built ALONGSIDE toucan_right —
+// the cirque variant stays buildable for the revert path (AZOTEQ_UPGRADE.md).
+//
+// Pinout + pinctrl mirror beekeeb/zmk-keyboard-toucan2 (b3e2b84d,
+// 2026-07-28): the converter board reuses the old cirque SPI pins for I2C
+// (SDA=P1.13, SCL=P1.15, RST=P1.14, RDY=P0.02), trackpad at 0x74
+// (BUILD_ASSERTed in the driver — not relocatable).
+
+#include "toucan.dtsi"
+
+&default_transform {
+    col-offset = <6>;
+};
+
+&kscan0 {
+    col-gpios
+    = <&gpio1 12 GPIO_ACTIVE_HIGH>
+    , <&gpio1 11 GPIO_ACTIVE_HIGH>
+    , <&gpio0 5 GPIO_ACTIVE_HIGH>
+    , <&gpio0 10 GPIO_ACTIVE_HIGH>
+    , <&gpio0 4 GPIO_ACTIVE_HIGH>
+    , <&gpio0 9 GPIO_ACTIVE_HIGH>
+    ;
+
+    row-gpios
+    = <&gpio0 19 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+    , <&gpio0 28 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+    , <&gpio1 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+    , <&gpio0 29 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+    ;
+};
+
+&pinctrl {
+    i2c0_azoteq_default: i2c0_azoteq_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 1, 13)>,
+                    <NRF_PSEL(TWIM_SCL, 1, 15)>;
+            bias-pull-up;
+        };
+    };
+
+    i2c0_azoteq_sleep: i2c0_azoteq_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 1, 13)>,
+                    <NRF_PSEL(TWIM_SCL, 1, 15)>;
+            low-power-enable;
+        };
+    };
+};
+
+&i2c0 {
+    status = "okay";
+    clock-frequency = <I2C_BITRATE_FAST>;
+    pinctrl-0 = <&i2c0_azoteq_default>;
+    pinctrl-1 = <&i2c0_azoteq_sleep>;
+    pinctrl-names = "default", "sleep";
+
+    tps43_trackpad: trackpad@74 {
+        compatible = "azoteq,tps43";
+        reg = <0x74>;
+        status = "okay";
+
+        rst-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
+        rdy-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+
+        // Cursor stays at 100%: driver-side scaling is integer division,
+        // so any value <100 zeroes out 1-count deltas and dead-zones slow
+        // precise movement. Net cursor speed runs ~2.25x beekeeb's
+        // reference (our left listener scales XY 225/100 for the cirque);
+        // if it's too fast, tune x-/y-resolution here before touching the
+        // left scaler.
+        sensitivity = <100>;
+        // Explicit: binding default (50) and C fallback (100) disagree.
+        // Wheel is scaled 1/20 on the left listener instead (no
+        // truncation at the source).
+        scroll-sensitivity = <100>;
+
+        // beekeeb's toucan2 tuning (default ~47deg scroll cone too big)
+        scroll-angle = <30>;
+        filter-settings = <0x0B>;
+        hold-time = <500>;
+
+        // Pass-1 gestures only (AZOTEQ_UPGRADE.md): zoom / swipes /
+        // three-finger-swipe need mapper processors on the central plus
+        // the zmk-input-zoom module — pass 2, after the stability trial.
+        single-tap;
+        two-finger-tap;
+        press-and-hold;
+        scroll;
+
+        switch-xy;
+        invert-scroll-y;
+
+        enable-power-management;
+        // idle-sleep deliberately OFF: same 300ms wake-lag tradeoff we
+        // rejected on the cirque; beekeeb marks it "not recommended" too.
+        report-rate-lp2 = <640>; // 55uA in LP2 vs 174uA at the 160ms default
+    };
+};
+
+// Same split-input endpoint (reg 0) the cirque feeds — the left half
+// doesn't know or care which pad is on the other end, so ONE left
+// firmware serves both right-half variants.
+&glidepoint_split {
+    device = <&tps43_trackpad>;
+};
