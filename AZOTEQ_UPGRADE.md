@@ -17,12 +17,19 @@
 >   `drivers/README.md`. No west.yml change was needed.
 > - ZMK stays on our pinned v0.3 — confirmed correct: beekeeb's toucan2
 >   itself builds on v0.3, not main.
-> - Pass-1 gestures only (tap / two-finger tap / press-and-hold /
->   scroll). Pass 2 (zoom via zmk-input-zoom, three-finger swipes, the
->   touch-hold mouse layer) needs central-side mappers — beekeeb's
->   reference mappings live in their toucan2 `toucan.dtsi`; note their
->   MOU layer sits at index 4, which is our GAME, so re-index when
->   porting.
+> - Gestures: tap / two-finger tap / press-and-hold / scroll from day 1;
+>   **pinch-zoom added 2026-08-20** (first trial-day feedback) via
+>   zmk-input-zoom (west-pinned) + zip_zoom_mapper on the central,
+>   Windows Ctrl bindings. Same day: cursor retuned to ~beekeeb feel via
+>   on-chip x/y-resolution 910x796 (the only azoteq-only knob without a
+>   truncation dead zone — driver sensitivity <100 and v0.3
+>   peripheral-side split processors both stateless-truncate).
+>   Still deferred: three-finger swipes + the touch-hold mouse layer
+>   (beekeeb's mappings live in their toucan2 `toucan.dtsi`; their MOU
+>   layer sits at index 4 = our GAME, so re-index when porting).
+>   Momentum/inertial scroll: NOT in this setup; beekeeb's
+>   zmk-input-inertia exists but self-describes as Zephyr 4.1 — needs a
+>   compat check against our v0.3/Zephyr 3.5 base before adopting.
 > - Known-good cirque uf2 set archived (md5-verified) at
 >   `firmware-archive/2026-07-04-cirque-lockupfix/` — step 5 done.
 > - Trial protocol below is unchanged and is the next step after CI

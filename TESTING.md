@@ -289,8 +289,9 @@ acceptable.
 ## Touchpad — Azoteq TPS43 variant only (toucan_right_azoteq build)
 
 Skip this section on the cirque right half. Gestures are decoded ON-CHIP
-(IQS550) — pass 1 enables tap, two-finger tap, press-and-hold, and
-two-finger scroll; zoom and swipes are deliberately off until pass 2.
+(IQS550) — enabled: tap, two-finger tap, press-and-hold, two-finger
+scroll, pinch-zoom (added 2026-08-20); swipes/three-finger-swipe are
+deliberately off (open decision, AZOTEQ_UPGRADE.md).
 
 - Single tap anywhere → left click.
 - Two-finger tap → right click.
@@ -302,6 +303,18 @@ two-finger scroll; zoom and swipes are deliberately off until pass 2.
   direction must match the cirque's natural-scroll feel (invert-scroll-y).
 - Slow one-finger movement still moves the cursor (no dead zone) — this
   guards the sensitivity=100 no-truncation decision.
+- Cursor speed feels ~like the cirque did (2026-08-20 retune: on-chip
+  x/y-resolution 910x796, targeting 1/2.25 of the assumed 2048x1792
+  default). Too fast/slow → adjust those two overlay values, nothing else.
+- **Pinch-zoom** (in Chrome or any Ctrl+Minus/Ctrl+Equal app): pinch out
+  → zoom in, pinch in → zoom out. Expect discrete browser-zoom STEPS
+  (the mapper emits keypresses), not smooth trackpad zoom. If steps come
+  too fast/slow per pinch, tune zip_zoom_mapper `sensitivity` in
+  toucan.dtsi (higher = more pinch travel per step).
+- After the resolution retune, re-verify tap and scroll-start feel:
+  chip distance thresholds are in resolution px and got ~2.25x bigger
+  physically — sloppy taps or late scroll-start → set tap-distance /
+  scroll-initial-distance in the overlay.
 - Orientation sanity: slide right → cursor right, slide up → cursor up
   (switch-xy is set per beekeeb; if diagonals are mirrored, tune
   invert-x/invert-y in the overlay).
