@@ -1,5 +1,33 @@
 # Azoteq TPS43 upgrade — planning doc
 
+> **STATUS 2026-08-19 — kit ARRIVED, integration IMPLEMENTED (branch
+> `kolter/azoteq-tps43`), not yet flashed.** beekeeb published
+> `beekeeb/zmk-keyboard-toucan2` on 2026-07-28, answering every item in
+> the blocked-on-beekeeb list (see that section for the answers). What
+> was built here, and where the plan below was overtaken:
+>
+> - New `toucan_right_azoteq` shield variant alongside the cirque one;
+>   one left firmware serves both (the azoteq pad feeds the same
+>   `&glidepoint_split` endpoint). `build.yaml` builds all three.
+> - Driver is **VENDORED into this repo** (`drivers/`, bindings in
+>   `dts/bindings/`) at geeksville master `66d51024`, with the K_NO_WAIT
+>   patch applied — decided 2026-08-19 over the fork-and-pin plan (gh on
+>   this host can't create personal repos; vendoring matches the
+>   nice_view_gem precedent). Provenance + update rules:
+>   `drivers/README.md`. No west.yml change was needed.
+> - ZMK stays on our pinned v0.3 — confirmed correct: beekeeb's toucan2
+>   itself builds on v0.3, not main.
+> - Pass-1 gestures only (tap / two-finger tap / press-and-hold /
+>   scroll). Pass 2 (zoom via zmk-input-zoom, three-finger swipes, the
+>   touch-hold mouse layer) needs central-side mappers — beekeeb's
+>   reference mappings live in their toucan2 `toucan.dtsi`; note their
+>   MOU layer sits at index 4, which is our GAME, so re-index when
+>   porting.
+> - Known-good cirque uf2 set archived (md5-verified) at
+>   `firmware-archive/2026-07-04-cirque-lockupfix/` — step 5 done.
+> - Trial protocol below is unchanged and is the next step after CI
+>   builds green and the hardware swap happens.
+
 Kolter ordered beekeeb's **Toucan Upgrade Kit** (2026-07-04, $48, ships
 late-Jul/late-Aug 2026): swaps the right half's Cirque Pinnacle (SPI) for an
 **Azoteq TPS43** multitouch pad (IQS550 controller, I2C, on-chip gestures).
@@ -162,11 +190,32 @@ Evaluate over ~2 weeks before making the door one-way:
 
 Revert = reflash archived cirque uf2 + reassemble bagged hardware.
 
-## Blocked-on-beekeeb (re-check ~late July 2026, with the CLAUDE.md check)
+## Blocked-on-beekeeb — RESOLVED 2026-08-19 (answers from beekeeb/zmk-keyboard-toucan2, published 2026-07-28)
 
-- Converter-board pinout: which XIAO pins are SDA/SCL/RDY/RST on the kit.
-- The promised conversion video/guide (docs.beekeeb.com).
-- A toucan2/azoteq branch or overlay in beekeeb/zmk-keyboard-toucan (their
-  real-world DT values: orientation flags, filter/threshold tuning, rates).
-- The new display options (WPM graph / toucan icon) land in the same
-  window — see CLAUDE.md watch item.
+- **Converter-board pinout:** the kit reuses the cirque's old SPI pins for
+  I2C — SDA=P1.13, SCL=P1.15, RST=P1.14 (`&gpio1 14`), RDY=P0.02
+  (`&gpio0 2`), trackpad at `0x74`, I2C fast mode, pinctrl pull-ups.
+- **Real-world DT values:** `switch-xy` + `invert-scroll-y`,
+  `scroll-angle 30` ("default ~47° too big on toucan2"),
+  `filter-settings 0x0B`, `hold-time 500`, sensitivity 100/100,
+  `report-rate-lp2 640` (55 µA vs 174 µA), power management on,
+  `idle-sleep` commented out as "not recommended" (the 300 ms wake lag).
+  All adopted in `toucan_right_azoteq.overlay`.
+- **Their module pin:** `beekeeb/zmk_driver_azoteq` at `revision: main` —
+  a bare branch (the exact thing this doc said to avoid). Their `main`
+  (c329f309) is content-identical to geeksville master (66d51024, only
+  the merge commit differs); their default branch `master` is the stale
+  one. Moot for us: driver vendored at that content.
+- **Driver movement since the 2026-07-04 baseline:** `three_finger_swipe`
+  gesture + `three-finger-swipe-throttle-ms` (beekeeb PR #2, merged
+  upstream 2026-07-31) and per-board build gating
+  (`DT_HAS_AZOTEQ_TPS43_ENABLED` — the driver can't leak into cirque/left
+  builds). **K_FOREVER is still unpatched upstream** — our vendored copy
+  carries the K_NO_WAIT fix.
+- **Display options:** landed in the same toucan2 repo —
+  `boards/shields/nice_view_gem/` there has 10 new widget files (chart /
+  WPM graph, layer_logo toucan icon, arc + vertical battery variants,
+  `CONFIG_TOUCAN_STATUS_SCREEN=0/1/2`). Separate change; see the CLAUDE.md
+  watch item.
+- Conversion video/guide (docs.beekeeb.com): not re-checked — the repo
+  answered the firmware side; check when doing the physical swap.

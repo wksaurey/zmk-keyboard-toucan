@@ -11,13 +11,18 @@ upstream check: search `beekeeb/zmk-keyboard-toucan`,
 commits updated since the last check that touch split lockups, input relay,
 central stacks, or the cirque driver. Public repos — `gh`/web search, no auth.
 
-Baseline as of 2026-07-04: beekeeb PR #19 merged (central
-`INPUT_THREAD_STACK_SIZE` fix — deployed here), PR #20/#24 closed-unmerged,
-`cirque-input-module` PR #4 (`K_NO_WAIT`) and #5 OPEN — **our `west.yml` pins
-PR #4's head SHA `00a4a28`, so its fate matters** (merge/rebase/supersede →
-repin), beekeeb issue #23 open (CS-line `GPIO_PULL_UP`, not our bug). Report
-only movement against this baseline, and update this section's baseline after
-each check.
+Baseline as of 2026-08-19 (previous: 2026-07-04): `cirque-input-module`
+PR #4 (`K_NO_WAIT`) still OPEN, head still `00a4a28` — **our `west.yml` pins
+that SHA, so its fate matters** (merge/rebase/supersede → repin); beekeeb
+issue #23 still open (CS-line `GPIO_PULL_UP`, not our bug); beekeeb PR #19
+merged / #20/#24 closed-unmerged (unchanged). NEW since 07-04:
+`beekeeb/zmk-keyboard-toucan2` published 2026-07-28 (full azoteq reference
+config, builds on ZMK v0.3); `geeksville/zmk_driver_azoteq` gained
+three_finger_swipe + throttle + DT-gated build (66d51024) — we vendored that
+content K_NO_WAIT-patched into `drivers/` (add `zmk_driver_azoteq` repos to
+the upstream check list; K_FOREVER still unpatched upstream, so check
+whether our patch can be retired). Report only movement against this
+baseline, and update this section's baseline after each check.
 
 Display note: the screen UI (`boards/shields/nice_view_gem/`) is a VENDORED,
 beekeeb-modified copy of `M165437/nice-view-gem` — it never updates via west.
@@ -26,20 +31,20 @@ Our copy predates upstream's 2026-02-16 API rename
 main and would break our v0.3 build if pulled today — but becomes REQUIRED
 whenever we rebase to ZMK ≥0.4. Check that repo only when planning the rebase.
 
-Watch item: Kolter ordered beekeeb's Azoteq TPS43 upgrade kit (ships
-late-Jul/Aug 2026) — full prep, integration map, and the
-blocked-on-beekeeb re-check list live in `AZOTEQ_UPGRADE.md`. The upgrade
-is explicitly reversible (he may prefer the Cirque); keep both trackpad
-configs buildable.
+Watch item (kit ARRIVED 2026-08-19, firmware implemented on branch
+`kolter/azoteq-tps43`): the Azoteq TPS43 upgrade — status header, resolved
+blocked-on-beekeeb answers, and the trial protocol live in
+`AZOTEQ_UPGRADE.md`; the vendored/patched driver rules in
+`drivers/README.md`. The upgrade is explicitly reversible (he may prefer
+the Cirque); keep both trackpad configs buildable.
 
-Watch item: beekeeb announced two NEW Toucan display options (WPM pixel
-graph + 1-bit pixel-art toucan icon, compile-time selectable) in the
-2026-06-04 "Introducing Toucan2" blog post — Kolter wants these. As of
-2026-07-04 no code is public (their `zmk-keyboard-displaydemo` repo is a
-generic sprite demo, not the Toucan screens); expected around the Toucan2
-ship date, late July 2026. When it lands, evaluate vendoring into
-`boards/shields/nice_view_gem/` (same XIAO + nice!view stack, likely
-portable to Toucan1).
+Watch item: the new Toucan display options Kolter wants (WPM pixel graph +
+toucan icon, `CONFIG_TOUCAN_STATUS_SCREEN=0/1/2`) are now PUBLIC in
+`beekeeb/zmk-keyboard-toucan2` `boards/shields/nice_view_gem/` (10 new
+widget files vs our vendored copy: chart, layer_logo, arc/vertical battery
+variants). Same XIAO + nice!view stack, ZMK v0.3 — vendoring into our
+`boards/shields/nice_view_gem/` looks straightforward; do it as its OWN
+change (not mixed into trackpad work).
 
 Why this exists: the July-2026 lockup root cause sat in an upstream PR for a
 month while we instrumented from scratch — a one-shot "upstream has nothing"

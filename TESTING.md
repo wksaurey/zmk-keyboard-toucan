@@ -286,6 +286,28 @@ acceptable.
 - **Horizontal:** slide RIGHT, page scrolls RIGHT. (Y inverted, X not.)
 - Scroll speed should feel ~30% slower than the upstream default.
 
+## Touchpad — Azoteq TPS43 variant only (toucan_right_azoteq build)
+
+Skip this section on the cirque right half. Gestures are decoded ON-CHIP
+(IQS550) — pass 1 enables tap, two-finger tap, press-and-hold, and
+two-finger scroll; zoom and swipes are deliberately off until pass 2.
+
+- Single tap anywhere → left click.
+- Two-finger tap → right click.
+- Press and hold, then slide → drag (left button held); release lifts it.
+  A drag must never stick — if a button ever wedges pressed, tap once to
+  clear it and note it (K_NO_WAIT drop-under-backpressure tradeoff,
+  drivers/README.md).
+- Two-finger slide → scroll, dominant axis only (no diagonal). Vertical
+  direction must match the cirque's natural-scroll feel (invert-scroll-y).
+- Slow one-finger movement still moves the cursor (no dead zone) — this
+  guards the sensitivity=100 no-truncation decision.
+- Orientation sanity: slide right → cursor right, slide up → cursor up
+  (switch-xy is set per beekeeb; if diagonals are mirrored, tune
+  invert-x/invert-y in the overlay).
+- SYM-layer scroller mode + NAV-T drag (sections above) still work — the
+  central listener is unchanged between pads.
+
 ## Sleep / wake
 
 - Idle for ~60 minutes. Display switches to "Sleep" screen.
