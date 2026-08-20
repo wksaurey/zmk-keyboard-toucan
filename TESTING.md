@@ -305,8 +305,22 @@ two-finger scroll; zoom and swipes are deliberately off until pass 2.
 - Orientation sanity: slide right → cursor right, slide up → cursor up
   (switch-xy is set per beekeeb; if diagonals are mirrored, tune
   invert-x/invert-y in the overlay).
-- SYM-layer scroller mode + NAV-T drag (sections above) still work — the
-  central listener is unchanged between pads.
+- SYM-layer scroller mode + NAV-T drag (sections above) still work
+  (one-finger XY→scroll on SYM behaves identically to the cirque).
+- **Known quirk — two-finger scroll WHILE HOLDING SYM:** the SYM scroller
+  override bypasses the base listener's 1/20 wheel scaler, so the pad's
+  native wheel events land ~3x faster AND direction-flipped (the child's
+  Y-invert stacks on the driver's invert-scroll-y) vs. off-layer
+  two-finger scroll. NOT an orientation bug — don't retune invert-x/y for
+  it. Open decision in AZOTEQ_UPGRADE.md: document-and-live-with vs.
+  retune the scroller child.
+- Right-half **columns 3 and 5 still type** (physical cols on P0.04/P0.05
+  — the pins the board's xiao_i2c would steal if its disable ever
+  regresses; verify after any sleep/wake cycle too).
+- **Boot timing:** azoteq init blocks ~610 ms normally and up to ~5.6 s
+  if the pad doesn't answer (missing/miswired FPC) — a slow right-half
+  boot on swap day is the driver retrying, not the June-style brick.
+  If it boots slow EVERY time, reseat the FPC before firmware archaeology.
 
 ## Sleep / wake
 

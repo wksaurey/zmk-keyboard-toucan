@@ -27,6 +27,25 @@
 >   `firmware-archive/2026-07-04-cirque-lockupfix/` — step 5 done.
 > - Trial protocol below is unchanged and is the next step after CI
 >   builds green and the hardware swap happens.
+>
+> **Open decisions from the 2026-08-19 review** (in-context + fresh review,
+> no correctness bugs; three free fixes landed same day):
+> - **SYM-layer two-finger scroll mismatch:** the scroller child (layers
+>   <2>) bypasses the base 1/20 wheel scaler (ZMK applies the first
+>   matching child INSTEAD of the base list), so azoteq wheel on SYM is
+>   ~3x fast + direction-flipped. Cirque /7 and azoteq /20 genuinely
+>   disagree — retuning the child changes cirque feel too. Documented in
+>   TESTING.md for now; decide after the trial.
+> - **RDY-race upstream defect (tps43.c ~1404 vs 1420):** the RDY GPIO
+>   interrupt is armed before k_work_init/k_sem_init — a microsecond
+>   boot-time window for a NULL-handler hard fault. 2-line fix, but a
+>   SECOND local divergence from upstream; candidate for an upstream PR
+>   instead. Decide before calling the vendored copy stable.
+> - **K_NO_WAIT drop observability:** input_report_* returns are
+>   discarded, so a dropped press/release (the documented tradeoff) is
+>   invisible in the USB capture — "stuck button" and "split link died"
+>   look identical. A rate-limited LOG_WRN on nonzero return would
+>   disambiguate; same second-divergence tradeoff as above.
 
 Kolter ordered beekeeb's **Toucan Upgrade Kit** (2026-07-04, $48, ships
 late-Jul/late-Aug 2026): swaps the right half's Cirque Pinnacle (SPI) for an
