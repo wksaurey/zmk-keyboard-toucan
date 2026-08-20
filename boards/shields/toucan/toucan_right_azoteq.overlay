@@ -107,12 +107,19 @@
 
         // beekeeb's toucan2 tuning (default ~47deg scroll cone too big)
         scroll-angle = <30>;
-        // Filter experiment (2026-08-20, "very floaty" feedback):
-        // 0x0B (beekeeb: IIR + MAV + ALP-count) -> 0x09 drops the MAV
-        // moving-average filter — position averaging is the classic
-        // floaty-cursor lag. If tracking gets too jittery instead,
-        // revert to 0x0B and tune filter-dynamic-* instead.
-        filter-settings = <0x09>;
+        // Filter experiments:
+        // 0x0B (beekeeb: IIR + MAV + ALP) -> 0x09 (2026-08-20, dropped
+        // MAV: cured the steady-state float) -> 0x08 (v11 feedback:
+        // intermittent float returned, now at SLOW speeds too — the
+        // dynamic IIR's speed thresholds are in counts/cycle, and our
+        // resolution cuts (now ~28% of native scale) push nearly all
+        // movement under its "slow = smooth heavily" threshold).
+        // 0x08 = ALP count filter only, NO XY position filtering.
+        // If slow-movement jitter appears: the fix is the scaler
+        // consolidation (native-scale resolution restores the filter's
+        // designed regime, so IIR can return) — not re-adding filters
+        // at this resolution.
+        filter-settings = <0x08>;
         hold-time = <500>;
 
         // Gestures (swipes / three-finger-swipe still deferred — they
