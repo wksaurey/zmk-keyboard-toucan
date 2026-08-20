@@ -98,7 +98,12 @@
 
         // beekeeb's toucan2 tuning (default ~47deg scroll cone too big)
         scroll-angle = <30>;
-        filter-settings = <0x0B>;
+        // Filter experiment (2026-08-20, "very floaty" feedback):
+        // 0x0B (beekeeb: IIR + MAV + ALP-count) -> 0x09 drops the MAV
+        // moving-average filter — position averaging is the classic
+        // floaty-cursor lag. If tracking gets too jittery instead,
+        // revert to 0x0B and tune filter-dynamic-* instead.
+        filter-settings = <0x09>;
         hold-time = <500>;
 
         // Gestures (swipes / three-finger-swipe still deferred — they
