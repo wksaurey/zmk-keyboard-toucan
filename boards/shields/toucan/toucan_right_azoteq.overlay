@@ -86,11 +86,17 @@
         // scroll-initial-distance explicitly to compensate.
         // Tuning history: 910x796 (2026-08-20 am, /2.25 of assumed
         // default) -> "still a little fast" -> 730x640 (~20% down) ->
-        // 620x544 (v9 verdict: bottom-of-range speed is the keeper —
-        // shift the whole range down 15% so it becomes the CENTER; the
-        // accel curve shape stays as validated).
-        x-resolution = <620>;
-        y-resolution = <544>;
+        // 620x544 (v9 verdict: bottom became the center) -> 515x450
+        // (v10: "still too fast", another ~17%).
+        // QUANTIZATION FLOOR: near/below this resolution, slow movement
+        // steps visibly (~2px per count after the central 2.25x scaler).
+        // If another cut is needed, DON'T lower this further — instead
+        // consolidate scaling: central scaler 225/100 -> 100/100 and
+        // resolution back up ~2.25x for the same net speed at much finer
+        // quantization (re-check accel thresholds + on-chip tap/scroll
+        // distances, which are in resolution px).
+        x-resolution = <515>;
+        y-resolution = <450>;
 
         // Keep 100: <100 dead-zones slow precise movement (see above).
         sensitivity = <100>;
