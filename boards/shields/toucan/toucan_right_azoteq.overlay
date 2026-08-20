@@ -81,11 +81,13 @@
         // default 2048x1792 (upstream README values) / 2.25. If still
         // off, adjust these absolute values — deterministic from here.
         // Chip gesture-distance defaults (tap-distance etc.) are in
-        // resolution px, so they got ~2.25x physically bigger; if taps/
+        // resolution px, so they got physically bigger; if taps/
         // scroll-start feel sloppy, set tap-distance /
         // scroll-initial-distance explicitly to compensate.
-        x-resolution = <910>;
-        y-resolution = <796>;
+        // Tuning history: 910x796 (2026-08-20 am, /2.25 of assumed
+        // default) -> "still a little fast" -> ~20% down (same day).
+        x-resolution = <730>;
+        y-resolution = <640>;
 
         // Keep 100: <100 dead-zones slow precise movement (see above).
         sensitivity = <100>;

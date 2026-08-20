@@ -303,9 +303,9 @@ deliberately off (open decision, AZOTEQ_UPGRADE.md).
   direction must match the cirque's natural-scroll feel (invert-scroll-y).
 - Slow one-finger movement still moves the cursor (no dead zone) — this
   guards the sensitivity=100 no-truncation decision.
-- Cursor speed feels ~like the cirque did (2026-08-20 retune: on-chip
-  x/y-resolution 910x796, targeting 1/2.25 of the assumed 2048x1792
-  default). Too fast/slow → adjust those two overlay values, nothing else.
+- Cursor speed feels right (2026-08-20 retunes: on-chip x/y-resolution
+  910x796, then 730x640 after "still a little fast"). Too fast/slow →
+  adjust those two overlay values, nothing else.
 - **Pinch-zoom** (in Chrome or any Ctrl+Minus/Ctrl+Equal app): pinch out
   → zoom in, pinch in → zoom out. Expect discrete browser-zoom STEPS
   (the mapper emits keypresses), not smooth trackpad zoom. If steps come
