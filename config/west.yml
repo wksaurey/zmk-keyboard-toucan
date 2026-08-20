@@ -12,6 +12,8 @@ manifest:
       url-base: https://github.com/geeksville
     - name: beekeeb
       url-base: https://github.com/beekeeb
+    - name: oleksandrmaslov
+      url-base: https://github.com/oleksandrmaslov
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -37,5 +39,14 @@ manifest:
       # (= the repo's only commit as of 2026-08-20); proven on ZMK v0.3
       # by beekeeb's toucan2 config.
       revision: 91bbe0c0e02145da50c9df798489479d28be1804
+    - name: zmk-pointing-acceleration
+      remote: oleksandrmaslov
+      # Velocity-based cursor acceleration (pointer_accel in toucan.dtsi).
+      # Picked 2026-08-20: 27 stars / 14 forks / 0 open issues — the most
+      # adopted of the ZMK accel processors (the others are 0-10 star
+      # forks of it). Pinned at head; v0.3-compatible (same
+      # input_processor API as the zoom module). Curve configurator:
+      # the acceleration_configurator repo under the same account.
+      revision: 0da8f97f8f2abb18fcc9d488b25357511922cf32
   self:
     path: config

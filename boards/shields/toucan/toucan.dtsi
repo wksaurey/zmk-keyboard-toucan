@@ -97,6 +97,27 @@
 
 / {
     input_processors {
+        // Velocity-based cursor acceleration (zmk-pointing-acceleration
+        // module, west.yml). Runs AFTER zip_xy_scaler in the listener,
+        // so its counts-per-second thresholds are in post-scaler units —
+        // the same units for either trackpad. min-factor 1000 keeps slow
+        // precise movement EXACTLY as tuned (no deceleration, no change
+        // below speed-threshold); fast flicks scale up to 3x. Affects
+        // REL_X/REL_Y only (hard-wired in the module) — scroll/zoom
+        // untouched. Tune: max-factor (top speed), speed-threshold
+        // (where accel starts), acceleration-exponent (2 = curvier).
+        pointer_accel: pointer_accel {
+            compatible = "zmk,input-processor-acceleration";
+            #input-processor-cells = <0>;
+            input-type = <INPUT_EV_REL>;
+            min-factor = <1000>;
+            max-factor = <3000>;
+            speed-threshold = <1200>;
+            speed-max = <6000>;
+            acceleration-exponent = <1>;
+            track-remainders;
+        };
+
         // Azoteq pinch-zoom: the TPS43 emits zoom as REL_MISC deltas;
         // the mapper (zmk-input-zoom module, west.yml) fires one
         // behavior per `sensitivity` delta units, mapped to
@@ -139,7 +160,7 @@
         // central-side so slow scrolls aren't integer-truncated to zero
         // at the source). Keeps ONE left firmware serving both right
         // halves.
-        input-processors = <&zip_xy_scaler 225 100>, <&zip_scroll_scaler 1 20>, <&zip_zoom_mapper>;
+        input-processors = <&zip_xy_scaler 225 100>, <&pointer_accel>, <&zip_scroll_scaler 1 20>, <&zip_zoom_mapper>;
         scroller {
             layers = <2>;
             input-processors = <

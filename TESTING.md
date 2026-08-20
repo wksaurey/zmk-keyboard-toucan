@@ -306,6 +306,13 @@ deliberately off (open decision, AZOTEQ_UPGRADE.md).
 - Cursor speed feels right (2026-08-20 retunes: on-chip x/y-resolution
   910x796, then 730x640 after "still a little fast"). Too fast/slow →
   adjust those two overlay values, nothing else.
+- **Acceleration** (added 2026-08-20, pointer_accel in toucan.dtsi):
+  slow deliberate movement must feel IDENTICAL to before (min-factor is
+  1.0 — accel only kicks in above the speed threshold); a fast flick
+  should cross the full screen without lifting. If fast movement feels
+  twitchy/overshooty, lower max-factor (3000 = 3x) or raise
+  speed-threshold; if the transition feels abrupt, set
+  acceleration-exponent 2.
 - **Pinch-zoom** (Ctrl+Minus/Equal keypresses — the Ctrl+wheel macro
   experiment was reverted 2026-08-20, see toucan.dtsi comment): pinch
   out → zoom in, pinch in → zoom out, as discrete browser-zoom steps.
