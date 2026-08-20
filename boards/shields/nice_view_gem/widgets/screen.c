@@ -58,14 +58,15 @@ static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
  **/
 
 // Discrete build-version stamp (git short SHA, generated at build time —
-// see repo-root CMakeLists.txt). Bottom edge: nothing in the style-1
-// layout draws below y=151 (output text/profile dots end at y~148/151).
-// Style 2's arc layout hasn't been collision-checked at this position —
-// re-verify if that style is ever re-enabled.
+// see repo-root CMakeLists.txt). Sits in the free band below the style-1
+// widgets (nothing draws below y=151: output text/profile dots end at
+// y~148/151); y=154 leaves a few px of breathing room to the screen's
+// bottom edge (was 158 — "right on the edge"). Style 2's arc layout
+// hasn't been collision-checked here — re-verify if ever re-enabled.
 static void draw_version_label(lv_obj_t *canvas) {
     lv_draw_label_dsc_t label_dsc;
     init_label_dsc(&label_dsc, LVGL_FOREGROUND, &quinquefive_8, LV_TEXT_ALIGN_LEFT);
-    lv_canvas_draw_text(canvas, 12, 158, SCREEN_WIDTH - 8, &label_dsc, TOUCAN_FW_VERSION);
+    lv_canvas_draw_text(canvas, 12, 154, SCREEN_WIDTH - 8, &label_dsc, TOUCAN_FW_VERSION);
 }
 
 static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
