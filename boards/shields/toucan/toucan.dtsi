@@ -106,25 +106,18 @@
         // REL_X/REL_Y only (hard-wired in the module) — scroll/zoom
         // untouched. Tune: max-factor (top speed), speed-threshold
         // (where accel starts), acceleration-exponent (2 = curvier).
-        // Curve v4 (2026-08-20, "delay/deadband at motion start"): the
-        // processor measures speed from time-since-last-event, so every
-        // stroke STARTS at min-factor regardless of real speed, and
-        // sub-unity factors swallow the first count(s) until remainders
-        // accumulate. Fix: floor up 700->850 and threshold 1200->500 so
-        // the decel zone covers only true crawl-speed motion and normal
-        // movement escapes the floor within a few events. History:
-        // v1 1000/3000@1200, v2 800/1800@1200, v3 700/1300@1200.
-        pointer_accel: pointer_accel {
-            compatible = "zmk,input-processor-acceleration";
-            #input-processor-cells = <0>;
-            input-type = <INPUT_EV_REL>;
-            min-factor = <850>;
-            max-factor = <1300>;
-            speed-threshold = <500>;
-            speed-max = <6000>;
-            acceleration-exponent = <1>;
-            track-remainders;
-        };
+        // FIRMWARE ACCELERATION REMOVED (2026-08-20 pm, Kolter's call):
+        // the keyboard ships FLAT 1:1 counts and Windows "Enhance
+        // pointer precision" (which he keeps ON for his desk mouse) is
+        // the single ballistics curve — stacking ours under EPP was
+        // double acceleration. The vendored processor stays in
+        // drivers/input_processor/ (compiles to nothing without a DT
+        // node); to revive it, restore the pointer_accel node + listener
+        // reference from git history (last curve: 850/1300@500/6000,
+        // curve-v4 rationale in that history). Caveat on record: EPP's
+        // velocity estimator sees our bursty BLE event arrival — if
+        // float persists on the flat setup, that interaction is the
+        // prime suspect.
 
         // Azoteq pinch-zoom: the TPS43 emits zoom as REL_MISC deltas;
         // the mapper (zmk-input-zoom module, west.yml) fires one
@@ -168,7 +161,7 @@
         // central-side so slow scrolls aren't integer-truncated to zero
         // at the source). Keeps ONE left firmware serving both right
         // halves.
-        input-processors = <&zip_xy_scaler 225 100>, <&pointer_accel>, <&zip_scroll_scaler 1 20>, <&zip_zoom_mapper>;
+        input-processors = <&zip_xy_scaler 225 100>, <&zip_scroll_scaler 1 20>, <&zip_zoom_mapper>;
         scroller {
             layers = <2>;
             input-processors = <
