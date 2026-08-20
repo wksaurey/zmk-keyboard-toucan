@@ -8,7 +8,12 @@
 >
 > - New `toucan_right_azoteq` shield variant alongside the cirque one;
 >   one left firmware serves both (the azoteq pad feeds the same
->   `&glidepoint_split` endpoint). `build.yaml` builds all three.
+>   `&glidepoint_split` endpoint). **Build matrix trimmed 2026-08-20
+>   (Kolter): CI builds only left + azoteq right + settings_reset.**
+>   The cirque SHIELD stays in the repo and buildable — revert uses the
+>   archived uf2s in `firmware-archive/` (always the real revert path);
+>   a cirque rebuild = re-add one build.yaml entry (template in its
+>   comment).
 > - Driver is **VENDORED into this repo** (`drivers/`, bindings in
 >   `dts/bindings/`) at geeksville master `66d51024`, with the K_NO_WAIT
 >   patch applied — decided 2026-08-19 over the fork-and-pin plan (gh on

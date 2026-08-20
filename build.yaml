@@ -19,23 +19,19 @@
 #
 ---
 include:
+  # Trimmed to three images (Kolter, 2026-08-20): left, azoteq right,
+  # settings_reset. The cirque right shield and the display style-1 left
+  # variant are still BUILDABLE — re-add a matrix entry to get one:
+  #   - board: seeeduino_xiao_ble
+  #     shield: toucan_right rgbled_adapter
+  #     snippet: zmk-usb-logging
+  # (cirque revert normally uses the archived uf2s in firmware-archive/,
+  # not a rebuild; display style 1 = add
+  # -DCONFIG_TOUCAN_STATUS_SCREEN=1 + artifact-name to a left entry.)
   - board: seeeduino_xiao_ble
     shield: toucan_left rgbled_adapter nice_view_gem
     snippet: studio-rpc-usb-uart
     cmake-args: -DCONFIG_ZMK_STUDIO=y
-  # Same left half, display style 1 (pixel-art toucan layer icon) instead
-  # of the conf-default style 2 (WPM chart + arcs). The style switch is
-  # compile-time, so "change screens" = flash the other left image.
-  - board: seeeduino_xiao_ble
-    shield: toucan_left rgbled_adapter nice_view_gem
-    snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_TOUCAN_STATUS_SCREEN=1
-    artifact-name: toucan_left_screen1_toucan_icon
-  - board: seeeduino_xiao_ble
-    shield: toucan_right rgbled_adapter
-    snippet: zmk-usb-logging
-  # Toucan2 upgrade-kit right half (Azoteq TPS43). Built ALONGSIDE the
-  # cirque right half — both stay flashable; see AZOTEQ_UPGRADE.md.
   - board: seeeduino_xiao_ble
     shield: toucan_right_azoteq rgbled_adapter
     snippet: zmk-usb-logging

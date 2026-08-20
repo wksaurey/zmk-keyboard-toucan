@@ -36,7 +36,10 @@ Watch item (kit ARRIVED 2026-08-19, firmware implemented on branch
 blocked-on-beekeeb answers, and the trial protocol live in
 `AZOTEQ_UPGRADE.md`; the vendored/patched driver rules in
 `drivers/README.md`. The upgrade is explicitly reversible (he may prefer
-the Cirque); keep both trackpad configs buildable.
+the Cirque); the cirque SHIELD stays in the repo, but the CI matrix
+builds only left + azoteq right + settings_reset (Kolter, 2026-08-20) —
+cirque revert = archived uf2s in `firmware-archive/`, or re-add the
+build.yaml entry (template in its comment).
 
 Watch item: the new Toucan display options Kolter wants (WPM pixel graph +
 toucan icon, `CONFIG_TOUCAN_STATUS_SCREEN=0/1/2`) are now PUBLIC in
