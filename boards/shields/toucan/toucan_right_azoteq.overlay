@@ -85,9 +85,12 @@
         // scroll-start feel sloppy, set tap-distance /
         // scroll-initial-distance explicitly to compensate.
         // Tuning history: 910x796 (2026-08-20 am, /2.25 of assumed
-        // default) -> "still a little fast" -> ~20% down (same day).
-        x-resolution = <730>;
-        y-resolution = <640>;
+        // default) -> "still a little fast" -> 730x640 (~20% down) ->
+        // 620x544 (v9 verdict: bottom-of-range speed is the keeper —
+        // shift the whole range down 15% so it becomes the CENTER; the
+        // accel curve shape stays as validated).
+        x-resolution = <620>;
+        y-resolution = <544>;
 
         // Keep 100: <100 dead-zones slow precise movement (see above).
         sensitivity = <100>;
@@ -125,7 +128,17 @@
         enable-power-management;
         // idle-sleep deliberately OFF: same 300ms wake-lag tradeoff we
         // rejected on the cirque; beekeeb marks it "not recommended" too.
-        report-rate-lp2 = <640>; // 55uA in LP2 vs 174uA at the 160ms default
+        // (Verified in tps43_idle_sleeper.c: without idle-sleep, ZMK's
+        // 30s IDLE state does NOT touch the pad — the after-idle wake
+        // lag is purely the chip's own LP ladder, tuned below.)
+        //
+        // Wake-lag fix (2026-08-20, "delay after sitting is really
+        // bad"): stay in LP1 (fast wake) for 100s before dropping to
+        // LP2 (register is 20s units), and sample LP2 at 320ms instead
+        // of 640ms so the worst-case first-touch delay after a long
+        // sit is ~0.3s. Cost: ~110uA in LP2 vs 55uA — negligible.
+        timeout-lp1 = <5>;
+        report-rate-lp2 = <320>;
     };
 };
 
