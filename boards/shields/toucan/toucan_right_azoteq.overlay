@@ -84,19 +84,22 @@
         // resolution px, so they got physically bigger; if taps/
         // scroll-start feel sloppy, set tap-distance /
         // scroll-initial-distance explicitly to compensate.
-        // Tuning history: 910x796 (2026-08-20 am, /2.25 of assumed
-        // default) -> "still a little fast" -> 730x640 (~20% down) ->
-        // 620x544 (v9 verdict: bottom became the center) -> 515x450
-        // (v10: "still too fast", another ~17%).
-        // QUANTIZATION FLOOR: near/below this resolution, slow movement
-        // steps visibly (~2px per count after the central 2.25x scaler).
-        // If another cut is needed, DON'T lower this further — instead
-        // consolidate scaling: central scaler 225/100 -> 100/100 and
-        // resolution back up ~2.25x for the same net speed at much finer
-        // quantization (re-check accel thresholds + on-chip tap/scroll
-        // distances, which are in resolution px).
-        x-resolution = <515>;
-        y-resolution = <450>;
+        // SCALER CONSOLIDATION (2026-08-20 pm): the central 2.25x XY
+        // upscale is GONE (toucan.dtsi) — resolution here is now the
+        // whole speed calibration, at ~1px per count instead of ~2.25px
+        // (v13's slow-movement jitter was that quantization). 1160x1012
+        // = 515x450 (the speed Kolter approved) x 2.25 — NET SPEED
+        // UNCHANGED from v13.
+        // Speed-cut history (in old post-scaler terms): 910x796 ->
+        // 730x640 -> 620x544 -> 515x450, each on trial feedback.
+        // COUPLING NOTE: on-chip gesture distances (tap-distance,
+        // scroll-initial-distance) are in resolution px — this ~2.25x
+        // raise makes their defaults physically TIGHTER. If taps start
+        // getting rejected (finger wiggle disqualifies them) or scroll
+        // engages too eagerly, set tap-distance / scroll-initial-distance
+        // explicitly (~2.25x their defaults).
+        x-resolution = <1160>;
+        y-resolution = <1012>;
 
         // Keep 100: <100 dead-zones slow precise movement (see above).
         sensitivity = <100>;

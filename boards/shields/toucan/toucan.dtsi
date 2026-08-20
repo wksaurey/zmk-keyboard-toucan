@@ -155,13 +155,20 @@
         compatible = "zmk,input-listener";
         status = "disabled";
         device = <&glidepoint_split>;
-        // zip_scroll_scaler: no-op for the cirque (it never emits
-        // REL_WHEEL); scales the azoteq TPS43's two-finger scroll to
-        // beekeeb's reference feel (driver emits at 100%, /20 here — done
-        // central-side so slow scrolls aren't integer-truncated to zero
-        // at the source). Keeps ONE left firmware serving both right
-        // halves.
-        input-processors = <&zip_xy_scaler 225 100>, <&zip_scroll_scaler 1 20>, <&zip_zoom_mapper>;
+        // XY SCALER REMOVED (2026-08-20 pm, scaler consolidation): the
+        // 225/100 upscale existed for the cirque; on the azoteq it
+        // turned each chip count into a ~2.25px cursor jump — the
+        // slow-movement jitter/stepping. XY now passes 1:1 and the
+        // azoteq overlay's x/y-resolution carries the full speed
+        // calibration at ~1px quantum. NOTE: a cirque right half run
+        // against THIS left will move at ~44% speed — the archived
+        // firmware-archive/ uf2 pair is the cirque revert path, not a
+        // mixed flash.
+        // zip_scroll_scaler: scales the azoteq's two-finger scroll
+        // (driver emits at 100%, /20 here — central-side so slow
+        // scrolls aren't integer-truncated at the source); no-op for
+        // the cirque, which never emits REL_WHEEL.
+        input-processors = <&zip_scroll_scaler 1 20>, <&zip_zoom_mapper>;
         scroller {
             layers = <2>;
             input-processors = <
