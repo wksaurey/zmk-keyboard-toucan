@@ -1,0 +1,6 @@
+/* Generated at build time from `git describe --always --dirty` on the
+ * config repo (see root CMakeLists.txt). Do not edit; the .in is the
+ * template. */
+#pragma once
+
+#define TOUCAN_FW_VERSION "@TOUCAN_FW_VERSION@"

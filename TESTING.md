@@ -347,6 +347,16 @@ deliberately off (open decision, AZOTEQ_UPGRADE.md).
   boot on swap day is the driver retrying, not the June-style brick.
   If it boots slow EVERY time, reseat the FPC before firmware archaeology.
 
+## Version stamp
+
+- The left display shows the build's git short SHA in small text at the
+  bottom edge. After ANY left flash, the SHA changing is the
+  flash-took confirmation; it must match `git rev-parse --short` of the
+  built commit.
+- The right half logs `toucan firmware <sha>` at boot on the USB
+  console — capture with the cable attached across a reset when a
+  right-half flash needs verifying.
+
 ## Sleep / wake
 
 - Idle for ~60 minutes. Display switches to "Sleep" screen.
