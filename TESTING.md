@@ -306,11 +306,19 @@ deliberately off (open decision, AZOTEQ_UPGRADE.md).
 - Cursor speed feels right (2026-08-20 retunes: on-chip x/y-resolution
   910x796, then 730x640 after "still a little fast"). Too fast/slow →
   adjust those two overlay values, nothing else.
-- **Pinch-zoom** (in Chrome or any Ctrl+Minus/Ctrl+Equal app): pinch out
-  → zoom in, pinch in → zoom out. Expect discrete browser-zoom STEPS
-  (the mapper emits keypresses), not smooth trackpad zoom. If steps come
-  too fast/slow per pinch, tune zip_zoom_mapper `sensitivity` in
-  toucan.dtsi (higher = more pinch travel per step).
+- **Pinch-zoom** (2026-08-20: now Ctrl+WHEEL ticks, not Ctrl+Minus/Equal):
+  pinch out → zoom in, pinch in → zoom out. Browsers still step their
+  fixed zoom ladder (step SIZE is the app's, not ours), but wheel-zoom
+  apps (maps, image editors) now respond too — verify in Chrome AND one
+  wheel-zoom app. Steps per pinch too many/few → zip_zoom_mapper
+  `sensitivity` in toucan.dtsi (higher = more travel per step). If zoom
+  ever "sticks" Ctrl or a step arrives un-Ctrl'd (scrolls instead of
+  zooming), set `wait-ms = <5>` on both zoom macros.
+- **Display (left half, after the toucan2 screen port):** style 2 shows
+  a WPM chart + arc battery/profile/output widgets. Verify battery arcs
+  for BOTH halves render, profile slot updates on BT profile switch,
+  WPM chart moves while typing, and the deep-sleep "Sleep" screen still
+  appears (~60 min idle).
 - After the resolution retune, re-verify tap and scroll-start feel:
   chip distance thresholds are in resolution px and got ~2.25x bigger
   physically — sloppy taps or late scroll-start → set tap-distance /
