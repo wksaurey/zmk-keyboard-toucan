@@ -69,9 +69,19 @@
 >   divergence from beekeeb's copy; also an upstream-PR candidate.
 >   Decide after living with both styles.
 > - **Trial-day-1/2 gesture + feel iterations (2026-08-20):** resolution
->   910x796 → 730x640; zoom added (Ctrl+± keypresses; Ctrl+wheel macro
->   attempt failed — &msc is timer-driven, see toucan.dtsi comment);
->   velocity acceleration added (pointer_accel, west-pinned module).
+>   910x796 → 730x640 → 620x544 → 515x450 (quantization floor reached —
+>   next cut = scaler consolidation, see overlay comment); zoom added
+>   (Ctrl+± keypresses; Ctrl+wheel macro attempt failed — &msc is
+>   timer-driven, see toucan.dtsi comment); velocity acceleration added
+>   (pointer_accel, vendored after upstream module broke CI); MAV filter
+>   off (cured steady-state float, no jitter); LP ladder tuned
+>   (timeout-lp1=5, lp2 320ms) for the after-sit wake lag.
+> - **WATCH: transient float under sustained fast flicking** (v10,
+>   2026-08-20, one occurrence, ~a minute, self-recovered). Candidates:
+>   split-link backlog draining late vs on-chip reATI recalibration
+>   after heavy rubbing. If reproducible, run the instrumented round:
+>   K_NO_WAIT drop-counter patch + the USB capture rig — drops logged
+>   during the float = link congestion; silence = on-chip.
 
 Kolter ordered beekeeb's **Toucan Upgrade Kit** (2026-07-04, $48, ships
 late-Jul/late-Aug 2026): swaps the right half's Cirque Pinnacle (SPI) for an
