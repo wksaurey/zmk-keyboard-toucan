@@ -10,6 +10,8 @@ manifest:
       url-base: https://github.com/caksoylar
     - name: geeksville
       url-base: https://github.com/geeksville
+    - name: beekeeb
+      url-base: https://github.com/beekeeb
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -28,5 +30,12 @@ manifest:
     - name: zmk-rgbled-widget
       remote: caksoylar
       revision: v0.3
+    - name: zmk-input-zoom
+      remote: beekeeb
+      # REL_MISC -> keypress input processor for the azoteq pinch-zoom
+      # (zip_zoom_mapper in toucan.dtsi). Pinned SHA per repo rule
+      # (= the repo's only commit as of 2026-08-20); proven on ZMK v0.3
+      # by beekeeb's toucan2 config.
+      revision: 91bbe0c0e02145da50c9df798489479d28be1804
   self:
     path: config

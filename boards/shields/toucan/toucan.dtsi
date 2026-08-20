@@ -1,5 +1,7 @@
 #include <input/processors.dtsi>
+#include <dt-bindings/input/input-event-codes.h>
 #include <dt-bindings/zmk/input_transform.h>
+#include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <physical_layouts.dtsi>
 
@@ -93,6 +95,22 @@
 };
 
 / {
+    input_processors {
+        // Azoteq pinch-zoom: the TPS43 emits zoom as REL_MISC deltas;
+        // this maps them to Ctrl+Minus / Ctrl+Equal (Windows browser
+        // zoom — beekeeb's TOUCAN_WIN_MODE bindings; their default is
+        // the macOS LG pair). Provided by the zmk-input-zoom module
+        // (west.yml). No-op for the cirque, which never emits REL_MISC.
+        zip_zoom_mapper: zip_zoom_mapper {
+            compatible = "zmk,input-processor-zoom";
+            #input-processor-cells = <0>;
+            event-code = <INPUT_REL_MISC>;
+            sensitivity = <10>;
+            bindings = <&kp LC(MINUS)>, <&kp LC(EQUAL)>;
+            track-remainders;
+        };
+    };
+
     split_inputs {
         #address-cells = <1>;
         #size-cells = <0>;
@@ -113,7 +131,7 @@
         // central-side so slow scrolls aren't integer-truncated to zero
         // at the source). Keeps ONE left firmware serving both right
         // halves.
-        input-processors = <&zip_xy_scaler 225 100>, <&zip_scroll_scaler 1 20>;
+        input-processors = <&zip_xy_scaler 225 100>, <&zip_scroll_scaler 1 20>, <&zip_zoom_mapper>;
         scroller {
             layers = <2>;
             input-processors = <

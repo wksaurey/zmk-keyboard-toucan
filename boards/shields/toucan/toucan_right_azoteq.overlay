@@ -99,13 +99,18 @@
         filter-settings = <0x0B>;
         hold-time = <500>;
 
-        // Pass-1 gestures only (AZOTEQ_UPGRADE.md): zoom / swipes /
-        // three-finger-swipe need mapper processors on the central plus
-        // the zmk-input-zoom module — pass 2, after the stability trial.
+        // Gestures (swipes / three-finger-swipe still deferred — they
+        // need a swipe_button_mapper on the central; see
+        // AZOTEQ_UPGRADE.md open decisions).
         single-tap;
         two-finger-tap;
         press-and-hold;
         scroll;
+        // Pinch-zoom: chip emits REL_MISC deltas; the central's
+        // zip_zoom_mapper (toucan.dtsi, zmk-input-zoom module) converts
+        // them to Ctrl+Minus / Ctrl+Equal — Chrome/Windows browser zoom
+        // steps, not smooth pinch (added 2026-08-20, trial feedback).
+        zoom;
 
         switch-xy;
         invert-scroll-y;
