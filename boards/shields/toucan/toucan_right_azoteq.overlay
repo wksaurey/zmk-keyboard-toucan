@@ -72,12 +72,22 @@
         rst-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
         rdy-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
 
-        // Cursor stays at 100%: driver-side scaling is integer division,
-        // so any value <100 zeroes out 1-count deltas and dead-zones slow
-        // precise movement. Net cursor speed runs ~2.25x beekeeb's
-        // reference (our left listener scales XY 225/100 for the cirque);
-        // if it's too fast, tune x-/y-resolution here before touching the
-        // left scaler.
+        // Cursor speed: tuned via ON-CHIP resolution, the only
+        // azoteq-only knob with no integer-truncation dead zone —
+        // driver sensitivity <100 is stateless division (1-count deltas
+        // vanish), and v0.3 peripheral-side split processors get no
+        // remainder state either. 2026-08-20 trial feedback: 2.25x felt
+        // "really fast", so target beekeeb-reference feel: assumed
+        // default 2048x1792 (upstream README values) / 2.25. If still
+        // off, adjust these absolute values — deterministic from here.
+        // Chip gesture-distance defaults (tap-distance etc.) are in
+        // resolution px, so they got ~2.25x physically bigger; if taps/
+        // scroll-start feel sloppy, set tap-distance /
+        // scroll-initial-distance explicitly to compensate.
+        x-resolution = <910>;
+        y-resolution = <796>;
+
+        // Keep 100: <100 dead-zones slow precise movement (see above).
         sensitivity = <100>;
         // Explicit: binding default (50) and C fallback (100) disagree.
         // Wheel is scaled 1/20 on the left listener instead (no
