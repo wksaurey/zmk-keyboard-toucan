@@ -53,6 +53,20 @@
 >   invisible in the USB capture — "stuck button" and "split link died"
 >   look identical. A rate-limited LOG_WRN on nonzero return would
 >   disambiguate; same second-divergence tradeoff as above.
+> - **Runtime display-style toggle (Kolter ask, 2026-08-20):** the
+>   toucan2 screen styles are compile-time (`#if` in screen.c selects
+>   which widget code exists), so a key shortcut can't switch them
+>   today. Interim: CI builds BOTH left images (style 2 default +
+>   `toucan_left_screen1_toucan_icon`); swap = reflash. Real feature =
+>   fork the vendored display: compile all styles, runtime state var +
+>   redraw, custom `zmk,behavior-*` to cycle, optional NVS persistence —
+>   a real C project (~few hundred lines + on-device debug) and a heavy
+>   divergence from beekeeb's copy; also an upstream-PR candidate.
+>   Decide after living with both styles.
+> - **Trial-day-1/2 gesture + feel iterations (2026-08-20):** resolution
+>   910x796 → 730x640; zoom added (Ctrl+± keypresses; Ctrl+wheel macro
+>   attempt failed — &msc is timer-driven, see toucan.dtsi comment);
+>   velocity acceleration added (pointer_accel, west-pinned module).
 
 Kolter ordered beekeeb's **Toucan Upgrade Kit** (2026-07-04, $48, ships
 late-Jul/late-Aug 2026): swaps the right half's Cirque Pinnacle (SPI) for an
