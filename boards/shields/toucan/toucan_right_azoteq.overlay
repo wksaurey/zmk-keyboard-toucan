@@ -117,13 +117,17 @@
         // dynamic IIR's speed thresholds are in counts/cycle, and our
         // resolution cuts (now ~28% of native scale) push nearly all
         // movement under its "slow = smooth heavily" threshold).
-        // 0x08 = ALP count filter only, NO XY position filtering.
-        // If slow-movement jitter appears: the fix is the scaler
-        // consolidation (native-scale resolution restores the filter's
-        // designed regime, so IIR can return) — not re-adding filters
-        // at this resolution.
-        filter-settings = <0x08>;
-        hold-time = <500>;
+        // 0x08 (ALP only) exposed raw stationary-finger noise once the
+        // scaler consolidation landed -> 0x09 re-enables the dynamic
+        // IIR (2026-08-20 pm): at native count-scale the filter is back
+        // in its designed regime. If the intermittent float returns
+        // with this, tune filter-dynamic-* betas — don't drop back to
+        // 0x08 (stationary jitter) or old low resolutions.
+        filter-settings = <0x09>;
+        // 500 (beekeeb) felt way too slow to engage drag; 300 keeps the
+        // false-drag margin (pausing mid-move with finger down must not
+        // start a drag) — drop to 250 only if 300 still drags its feet.
+        hold-time = <300>;
 
         // Gestures (swipes / three-finger-swipe still deferred — they
         // need a swipe_button_mapper on the central; see
