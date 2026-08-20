@@ -106,16 +106,17 @@
         // REL_X/REL_Y only (hard-wired in the module) — scroll/zoom
         // untouched. Tune: max-factor (top speed), speed-threshold
         // (where accel starts), acceleration-exponent (2 = curvier).
-        // Curve v2 (2026-08-20 feedback: "ceiling way too fast", wants
-        // slow-speed fine control): min-factor <1000 adds a precision
-        // zone below speed-threshold — safe HERE because this processor
-        // tracks remainders (no dead zone), unlike driver-side scaling.
+        // Curve v3 (2026-08-20, third feedback round: bottom a little
+        // lower, top a LOT lower; v2 was 800/1800, v1 was 1000/3000).
+        // min-factor <1000 adds a precision zone below speed-threshold —
+        // safe HERE because this processor tracks remainders (no dead
+        // zone), unlike driver-side scaling.
         pointer_accel: pointer_accel {
             compatible = "zmk,input-processor-acceleration";
             #input-processor-cells = <0>;
             input-type = <INPUT_EV_REL>;
-            min-factor = <800>;
-            max-factor = <1800>;
+            min-factor = <700>;
+            max-factor = <1300>;
             speed-threshold = <1200>;
             speed-max = <6000>;
             acceleration-exponent = <1>;
