@@ -96,45 +96,25 @@
 };
 
 / {
-    macros {
-        // One zoom step = a Ctrl-wrapped wheel tick. Ctrl+wheel is the
-        // universal Windows zoom idiom — browsers step the same zoom
-        // ladder as Ctrl+Minus/Equal, but wheel-zoom apps (maps, image
-        // editors, CAD) respond to this where they ignore Ctrl+keys.
-        // If Ctrl occasionally doesn't register before the tick over
-        // BLE, give both macros `wait-ms = <5>`.
-        zoom_out_step: zoom_out_step {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            wait-ms = <0>;
-            tap-ms = <0>;
-            bindings = <&macro_press &kp LCTRL>,
-                       <&macro_tap &msc SCRL_DOWN>,
-                       <&macro_release &kp LCTRL>;
-        };
-        zoom_in_step: zoom_in_step {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            wait-ms = <0>;
-            tap-ms = <0>;
-            bindings = <&macro_press &kp LCTRL>,
-                       <&macro_tap &msc SCRL_UP>,
-                       <&macro_release &kp LCTRL>;
-        };
-    };
-
     input_processors {
         // Azoteq pinch-zoom: the TPS43 emits zoom as REL_MISC deltas;
         // the mapper (zmk-input-zoom module, west.yml) fires one
-        // behavior per `sensitivity` delta units — bound to the
-        // Ctrl+wheel macros above (2026-08-20; was Ctrl+Minus/Equal).
+        // behavior per `sensitivity` delta units, mapped to
+        // Ctrl+Minus / Ctrl+Equal (Windows browser zoom).
         // No-op for the cirque, which never emits REL_MISC.
+        //
+        // Ctrl+WHEEL bindings were TRIED and REVERTED (2026-08-20, one
+        // firmware round): &msc is a timer-driven scroll-while-held
+        // behavior, so a macro's instantaneous press+release fires zero
+        // wheel ticks — pinch did nothing at the host. Don't re-attempt
+        // with macros; it would need a one-shot wheel-report behavior
+        // that ZMK v0.3 doesn't have.
         zip_zoom_mapper: zip_zoom_mapper {
             compatible = "zmk,input-processor-zoom";
             #input-processor-cells = <0>;
             event-code = <INPUT_REL_MISC>;
             sensitivity = <10>;
-            bindings = <&zoom_out_step>, <&zoom_in_step>;
+            bindings = <&kp LC(MINUS)>, <&kp LC(EQUAL)>;
             track-remainders;
         };
     };

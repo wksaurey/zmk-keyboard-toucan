@@ -306,14 +306,12 @@ deliberately off (open decision, AZOTEQ_UPGRADE.md).
 - Cursor speed feels right (2026-08-20 retunes: on-chip x/y-resolution
   910x796, then 730x640 after "still a little fast"). Too fast/slow →
   adjust those two overlay values, nothing else.
-- **Pinch-zoom** (2026-08-20: now Ctrl+WHEEL ticks, not Ctrl+Minus/Equal):
-  pinch out → zoom in, pinch in → zoom out. Browsers still step their
-  fixed zoom ladder (step SIZE is the app's, not ours), but wheel-zoom
-  apps (maps, image editors) now respond too — verify in Chrome AND one
-  wheel-zoom app. Steps per pinch too many/few → zip_zoom_mapper
-  `sensitivity` in toucan.dtsi (higher = more travel per step). If zoom
-  ever "sticks" Ctrl or a step arrives un-Ctrl'd (scrolls instead of
-  zooming), set `wait-ms = <5>` on both zoom macros.
+- **Pinch-zoom** (Ctrl+Minus/Equal keypresses — the Ctrl+wheel macro
+  experiment was reverted 2026-08-20, see toucan.dtsi comment): pinch
+  out → zoom in, pinch in → zoom out, as discrete browser-zoom steps.
+  Steps per pinch too many/few → zip_zoom_mapper `sensitivity` in
+  toucan.dtsi (higher = more travel per step). For wheel-zoom apps,
+  hold a physical Ctrl and two-finger-scroll instead.
 - **Display (left half, after the toucan2 screen port):** style 2 shows
   a WPM chart + arc battery/profile/output widgets. Verify battery arcs
   for BOTH halves render, profile slot updates on BT profile switch,
