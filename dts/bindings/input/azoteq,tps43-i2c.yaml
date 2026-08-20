@@ -1,0 +1,6 @@
+description: |
+  Azoteq TPS43 touchpad sensor driver over I2C interface
+
+compatible: "azoteq,tps43"
+
+include: ["i2c-device.yaml", "azoteq,tps43-common.yaml"]

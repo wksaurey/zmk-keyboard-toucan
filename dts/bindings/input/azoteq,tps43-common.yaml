@@ -1,0 +1,427 @@
+properties:
+  rdy-gpios:
+    type: phandle-array
+    required: false
+    description: GPIO pin for RDY interrupt signal (Ready)
+
+  rst-gpios:
+    type: phandle-array
+    required: false
+    description: GPIO pin for RST reset signal (Reset)
+
+  filter-settings:
+    type: int
+    default: 0x0F
+    description: |
+      Bit definitions:
+      - Bit 0 (0x01): IIR filter - infinite impulse response filter for
+        coordinate smoothing. Reduces high-frequency noise and jitter.
+      - Bit 1 (0x02): MAV filter - moving average filter for coordinate
+        stabilization. Removes outliers and averages recent measurements.
+      - Bit 2 (0x04): IIR select - When set, uses fixed IIR coefficient.
+        When clear (default), uses dynamic IIR that adapts to movement speed.
+      - Bit 3 (0x08): ALP count filter - Adaptive Learning Process filter
+        for noise suppression. Filters unwanted touch events based on learned patterns.
+      
+      Common configurations:
+      - 0x0B: IIR + MAV + ALP enabled, dynamic IIR.
+        Good balance of stability and responsiveness.
+      - 0x0F (default): All filters enabled including fixed IIR select.
+        Maximum smoothing, may introduce increased latency.
+      - 0x03: IIR + MAV only. Basic smoothing without ALP filtering.
+      - 0x01: IIR only. Minimal filtering, lowest latency.
+      - 0x00: All filters disabled. Raw sensor data, may have noise.
+      
+      Values can be combined using bitwise OR (e.g., 0x01 | 0x02 = 0x03).
+      
+  filter-dynamic-bottom:
+    type: int
+    required: false
+    description: |
+      XY dynamic filter bottom beta
+      Controls the minimum filtering applied to touch coordinates.
+      Lower values reduce smoothing at low speeds, improving responsiveness.
+      See datasheet section 5.9.2.1. Only written if explicitly set.
+
+  filter-dynamic-lower:
+    type: int
+    required: false
+    description: |
+      XY dynamic filter lower speed threshold 
+      Defines the speed below which the bottom beta filter coefficient is used.
+      Only written if explicitly set.
+
+  filter-dynamic-upper:
+    type: int
+    required: false
+    description: |
+      XY dynamic filter upper speed threshold 
+      Defines the speed above which maximum filtering is applied.
+      Only written if explicitly set.
+
+  x-resolution:
+    type: int
+    required: false
+    description: |
+      X axis resolution in pixels
+      Sets the trackpad X resolution. Only written if explicitly set.
+
+  y-resolution:
+    type: int
+    required: false
+    description: |
+      Y axis resolution in pixels
+      Sets the trackpad Y resolution. Only written if explicitly set.
+
+  sensitivity:
+    type: int
+    required: false
+    default: 100
+    description: Touch sensitivity percentage (100 = normal, higher = more sensitive)
+
+  scroll-sensitivity:
+    type: int
+    required: false
+    default: 50
+    description: Scroll sensitivity percentage (100 = normal, higher = more sensitive)
+
+  zoom-sensitivity:
+    type: int
+    required: false
+    default: 100
+    description: Zoom sensitivity percentage (100 = normal, higher = more sensitive)
+
+  enable-power-management:
+    type: boolean
+    required: false
+    description: Enable automatic power management (suspend/resume)
+
+  idle-sleep:
+    type: boolean
+    required: false
+    description: |
+      If set, the trackpad is put to sleep when ZMK transitions to the IDLE
+      activity state. If not set (default), only the SLEEP activity state puts
+      the trackpad to sleep; IDLE leaves the trackpad active.
+
+  single-tap:
+    type: boolean
+    required: false
+    description: Enable single tap gesture
+
+  two-finger-tap:
+    type: boolean
+    required: false
+    description: Enable two-finger tap gesture
+
+  scroll:
+    type: boolean
+    required: false
+    description: Enable scroll gesture
+
+  zoom:
+    type: boolean
+    required: false
+    description: Enable zoom gesture (pinch-to-zoom)
+
+  swipes:
+    type: boolean
+    required: false
+    description: Enable swipe processing. When enabled, tracks swipes as INPUT_BTN_NORTH/SOUTH/EAST/WEST.
+
+  three-finger-swipe:
+    type: boolean
+    required: false
+    description: >
+      Enable three-finger-only swipe processing, tracked as INPUT_BTN_NORTH/SOUTH/EAST/WEST.
+      Independent of `swipes`, so a three-finger swipe can be enabled without also enabling
+      single-finger swipe.
+
+  three-finger-swipe-throttle-ms:
+    type: int
+    required: false
+    default: 300
+    description: >
+      Minimum time in milliseconds between consecutive three-finger swipe actuations.
+      Unlike the single-finger swipe (a single hardware-gated gesture event), a
+      three-finger swipe is derived from raw movement deltas reported on every touch
+      update while 3 fingers are down, so a single continuous swipe motion can otherwise
+      fire the gesture many times in a row. Set to 0 to disable throttling.
+
+  switch-xy:
+    type: boolean
+    required: false
+    description: Swap X and Y axes
+
+  press-and-hold:
+    type: boolean
+    required: false
+    description: Enable press and hold gesture
+
+  invert-x:
+    type: boolean
+    description: If present, invert X coordinate values.
+      
+  invert-y:
+    type: boolean
+    description: If present, invert Y coordinate values.
+
+  invert-scroll-x:
+    type: boolean
+    description: If present, invert X scroll values.
+            
+  invert-scroll-y:
+    type: boolean
+    description: If present, invert Y scroll values.
+
+  swipe-initial-distance:
+    type: int
+    required: false
+    description: |
+      Swipe initial distance in pixels.
+      Sets the minimum distance a finger must travel to trigger a swipe gesture.
+      Written to the SWIPE_INITIAL_DISTANCE register (0x06C1).
+      Only written if explicitly set.
+
+  swipe-initial-time:
+    type: int
+    required: false
+    description: |
+      Swipe initial time in milliseconds.
+      Sets the maximum time allowed for the initial swipe movement.
+      Written to the SWIPE_INITIAL_TIME register (0x06BF).
+      Only written if explicitly set.
+
+  swipe-angle:
+    type: int
+    required: false
+    description: |
+      Swipe angle in degrees.
+      Sets the maximum deviation angle for a swipe gesture.
+      The value is specified in degrees and internally converted to
+      64*tan(angle) before writing to the SWIPE_ANGLE register (0x06C7).
+      Only written if explicitly set.
+
+  swipe-consecutive-distance:
+    type: int
+    required: false
+    description: |
+      Swipe consecutive distance in pixels.
+      Sets the distance threshold for consecutive swipe segments.
+      Written to the SWIPE_CONSECUTIVE_DISTANCE register (0x06C5).
+      Only written if explicitly set.
+
+  swipe-consecutive-time:
+    type: int
+    required: false
+    description: |
+      Swipe consecutive time in milliseconds.
+      Sets the time threshold for consecutive swipe segments.
+      Written to the SWIPE_CONSECUTIVE_TIME register (0x06C3).
+      Only written if explicitly set.
+
+  scroll-initial-distance:
+    type: int
+    required: false
+    description: |
+      Scroll initial distance in pixels.
+      Sets the minimum distance for a scroll gesture to trigger.
+      Written to the SCROLL_INITIAL_DISTANCE register (0x06C8).
+      Only written if explicitly set.
+
+  scroll-angle:
+    type: int
+    required: false
+    description: |
+      Scroll angle in degrees.
+      Sets the maximum deviation angle for a scroll gesture.
+      The value is specified in degrees and internally converted to
+      64*tan(angle) before writing to the SCROLL_ANGLE register (0x06CA).
+      Only written if explicitly set.
+
+  zoom-initial-distance:
+    type: int
+    required: false
+    description: |
+      Zoom initial distance in pixels.
+      Sets the minimum distance for a zoom gesture to trigger.
+      Written to the ZOOM_INITIAL_DISTANCE register (0x06CB).
+      Only written if explicitly set.
+
+  zoom-consecutive-distance:
+    type: int
+    required: false
+    description: |
+      Zoom consecutive distance in pixels.
+      Sets the distance threshold for consecutive zoom segments.
+      Written to the ZOOM_CONSECUTIVE_DISTANCE register (0x06CD).
+      Only written if explicitly set.
+
+  ati-target:
+    type: int
+    required: false
+    description: |
+      ATI target value (2 bytes).
+      Sets the target count for the ATI (Automatic Tuning Implementation) process.
+      Written to the ATI_TARGET register (0x056D).
+      Only written if explicitly set.
+
+  ref-drift-limit:
+    type: int
+    required: false
+    description: |
+      ATI reference drift limit (1 byte).
+      Controls the allowed drift of the reference level before re-ATI is triggered.
+      Written to the REF_DRIFT_LIMIT register (0x0571).
+      Only written if explicitly set.
+
+  reati-lower-limit:
+    type: int
+    required: false
+    description: |
+      Re-ATI lower count limit (1 byte).
+      Sets the lower threshold for triggering automatic re-ATI.
+      Written to the REATI_LOWER_LIMIT register (0x0573).
+      Only written if explicitly set.
+
+  reati-upper-limit:
+    type: int
+    required: false
+    description: |
+      Re-ATI upper count limit (1 byte).
+      Sets the upper threshold for triggering automatic re-ATI.
+      Written to the REATI_UPPER_LIMIT register (0x0574).
+      Only written if explicitly set.
+
+  max-count-limit:
+    type: int
+    required: false
+    description: |
+      ATI max count limit (2 bytes).
+      Sets the maximum count value allowed during ATI.
+      Written to the MAX_COUNT_LIMIT register (0x0575).
+      Only written if explicitly set.
+
+  ati-retry-time:
+    type: int
+    required: false
+    description: |
+      ATI retry time in seconds (1 byte).
+      Sets the minimum time between automatic re-ATI attempts.
+      Written to the ATI_RETRY_TIME register (0x0577).
+      Only written if explicitly set.
+
+  report-rate-active:
+    type: int
+    required: false
+    description: |
+      Report rate in active mode in milliseconds (2 bytes).
+      Controls how frequently the device reports data when actively touched.
+      Written to the REPORT_RATE_ACTIVE register (0x057A).
+      Only written if explicitly set.
+
+  report-rate-idle-touch:
+    type: int
+    required: false
+    description: |
+      Report rate in idle-touch mode in milliseconds (2 bytes).
+      Controls the reporting frequency when idle with touch contact.
+      Written to the REPORT_RATE_IDLE_TOUCH register (0x057C).
+      Only written if explicitly set.
+
+  report-rate-idle:
+    type: int
+    required: false
+    description: |
+      Report rate in idle mode in milliseconds (2 bytes).
+      Controls the reporting frequency in idle mode (no touch).
+      Written to the REPORT_RATE_IDLE register (0x057E).
+      Only written if explicitly set.
+
+  report-rate-lp1:
+    type: int
+    required: false
+    description: |
+      Report rate in low-power mode 1 in milliseconds (2 bytes).
+      Written to the REPORT_RATE_LP1 register (0x0580).
+      Only written if explicitly set.
+
+  report-rate-lp2:
+    type: int
+    required: false
+    description: |
+      Report rate in low-power mode 2 in milliseconds (2 bytes).
+      Written to the REPORT_RATE_LP2 register (0x0582).
+      Only written if explicitly set.
+
+  timeout-active:
+    type: int
+    required: false
+    description: |
+      Timeout for active mode in seconds (1 byte).
+      Time before transitioning from active to idle-touch mode.
+      Written to the TIMEOUT_ACTIVE register (0x0584).
+      Only written if explicitly set.
+
+  timeout-idle-touch:
+    type: int
+    required: false
+    description: |
+      Timeout for idle-touch mode in seconds (1 byte).
+      Time before transitioning from idle-touch to idle mode.
+      Written to the TIMEOUT_IDLE_TOUCH register (0x0585).
+      Only written if explicitly set.
+
+  timeout-idle:
+    type: int
+    required: false
+    description: |
+      Timeout for idle mode in seconds (1 byte).
+      Time before transitioning from idle to LP1 mode.
+      Written to the TIMEOUT_IDLE register (0x0586).
+      Only written if explicitly set.
+
+  timeout-lp1:
+    type: int
+    required: false
+    description: |
+      Timeout for low-power mode 1 in 20 sec units (1 byte). i.e. 3 means 60 seconds.
+      Time before transitioning from LP1 to LP2 mode.
+      Written to the TIMEOUT_LP1 register (0x0587).
+      Only written if explicitly set.
+
+  ref-update-time:
+    type: int
+    required: false
+    description: |
+      Reference update time in seconds (1 byte).
+      Controls how frequently the reference level is updated.
+      Written to the REF_UPDATE_TIME register (0x0588).
+      Only written if explicitly set.
+
+  tap-time:
+    type: int
+    required: false
+    description: |
+      Maximum time for a tap gesture in milliseconds (2 bytes).
+      Sets the maximum duration a finger can be in contact for a tap to register.
+      Written to the TAP_TIME register (0x06B9).
+      Only written if explicitly set.
+
+  tap-distance:
+    type: int
+    required: false
+    description: |
+      Maximum distance for a tap gesture in pixels (2 bytes).
+      Sets the maximum finger movement allowed during a tap gesture.
+      Written to the TAP_DISTANCE register (0x06BB).
+      Only written if explicitly set.
+
+  hold-time:
+    type: int
+    required: false
+    description: |
+      Minimum time for a press-and-hold gesture in milliseconds (2 bytes).
+      Sets the minimum duration a finger must be held to trigger a hold gesture.
+      Written to the HOLD_TIME register (0x06BD).
+      Only written if explicitly set.
