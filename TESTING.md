@@ -203,14 +203,15 @@ Current behavior:
     Expect the right half to reboot and mount as a USB mass-storage
     drive (`XIAO-SENSE` or similar) on whatever host it is cabled to.
     The left half should keep working normally throughout.
-  - **Locality is the thing under test.** `&bootloader` is a
-    source-local behavior: the central resolves the press and hands
-    execution to the half the key physically sits on. If ZMK v0.3
-    instead runs it centrally, the **LEFT** half will drop into DFU —
-    that is the failure signature to watch for, and it is harmless
-    (re-flash the left, or just unplug and let it reboot).
-  - Untested as of the commit that added it — verify on first flash and
-    strike this line once confirmed.
+  - **Locality: VERIFIED on ZMK v0.3** (2026-08-27, first flash of
+    `f2d4698`). `&bootloader` is source-local — the central resolves the
+    press and hands execution to the half the key physically sits on, so
+    a right-half key reboots the RIGHT half. Confirmed working on
+    hardware; no longer speculative.
+  - Consequence worth remembering: adding or moving this binding only
+    ever needs a LEFT-half flash, because the keymap lives on the
+    central. That is the whole point — the right half's reset button is
+    the awkward one.
 
 ## GAME — FPS-style gaming layer
 
