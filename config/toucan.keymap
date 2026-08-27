@@ -124,7 +124,7 @@
             bindings = <
                 &kp TAB   &kp F1 &kp F2  &kp F3  &kp F4  &trans    &kp C_VOL_DN &kp C_MUTE  &kp C_VOL_UP &trans &kp PSCRN &kp BSPC
                 &mt LCTRL CAPS &kp F5 &kp F6  &kp F7  &kp F8  &tog GAME &trans       &trans      &trans       &trans &trans &trans
-                &bt BT_CLR &kp F9 &kp F10 &kp F11 &kp F12 &trans    &trans       &trans      &trans       &trans &trans &trans
+                &bt BT_CLR &kp F9 &kp F10 &kp F11 &kp F12 &trans    &trans       &trans      &trans       &trans &trans &bootloader
                                    &kp LALT &kp RET &td_nav   &td_sym &kp SPACE &kp RGUI
             >;
         };

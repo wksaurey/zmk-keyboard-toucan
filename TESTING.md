@@ -195,6 +195,22 @@ Current behavior:
   in `52895bc` — was `&mo TAB` which is invalid.)
 - ADJ middle-row col 5 (G position) → `&tog GAME` — toggles into the
   GAME layer. See GAME section below.
+- **ADJ bottom-row col 11 (physical RSHFT position) → `&bootloader` —
+  puts the RIGHT half into DFU.** This is the software route around the
+  right half's stiff reset button (crooked controller solder job), so it
+  matters that it works: the button is the only fallback.
+  - Test: hold both inner thumbs, tap the bottom-right corner key.
+    Expect the right half to reboot and mount as a USB mass-storage
+    drive (`XIAO-SENSE` or similar) on whatever host it is cabled to.
+    The left half should keep working normally throughout.
+  - **Locality is the thing under test.** `&bootloader` is a
+    source-local behavior: the central resolves the press and hands
+    execution to the half the key physically sits on. If ZMK v0.3
+    instead runs it centrally, the **LEFT** half will drop into DFU —
+    that is the failure signature to watch for, and it is harmless
+    (re-flash the left, or just unplug and let it reboot).
+  - Untested as of the commit that added it — verify on first flash and
+    strike this line once confirmed.
 
 ## GAME — FPS-style gaming layer
 
