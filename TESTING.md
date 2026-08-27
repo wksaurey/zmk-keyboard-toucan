@@ -182,9 +182,15 @@ Current behavior:
 
 - Activate ADJ (hold both inner thumbs, or toggle one then hold the
   other).
-- F-keys on the left hand: F1–F10 + F12 (11 keys). F11 was displaced
-  from middle-row col 5 by `&tog GAME` (commit `dff378a`).
-- Vol-down / mute / vol-up on the right home row.
+- F-keys on the left hand, cols 1–4, reading order: F1–F4 top row,
+  F5–F8 middle row, F9–F12 bottom row (all 12 — F11 regained when the
+  block shifted left off col 5). Col 5 is `&trans` above and below
+  `&tog GAME`.
+- Vol-down / mute / vol-up on the right top row.
+- Top-row col 10 (physical P position) → `&kp PSCRN` — Print Screen.
+  Mnemonic: "P for print." Confirm it triggers the host screenshot
+  action (Windows: clipboard capture; Linux: whatever the DE binds to
+  PrtSc).
 - Confirm TAB on top-row col 0 of ADJ now actually emits Tab. (Fixed
   in `52895bc` — was `&mo TAB` which is invalid.)
 - ADJ middle-row col 5 (G position) → `&tog GAME` — toggles into the
@@ -241,22 +247,30 @@ keycode:
 - Physical T → R (reload).
 - Physical G → F (use/interact).
 - Physical B → M.
-- Physical TAB key (top, outer) → TAB (fall-through to BASE).
+- Physical TAB key (top, outer) → `` ` `` (GRAVE) — push-to-talk. Bound
+  directly on GAME (pos0); no longer falls through to BASE TAB.
 - Physical LShift key (bottom, outer) → RET (enter).
 
 ### ESC
 
 ESC is bound **directly** on the outer home-row pinky (physical
 Ctrl/Caps position) — plain `&kp ESC`, no fall-through, no Caps-swap
-latency. (The top-outer key, which previously held ESC, now falls
-through to BASE and sends TAB.)
+latency. (The top-outer key, which previously held ESC, now sends
+GRAVE — push-to-talk, see below.)
+
+### Push-to-talk
+
+- Top-outer-left key (pos0, physical BASE-TAB position) → `` ` ``
+  (GRAVE). This is Marvel Rivals push-to-talk. Hold it to transmit
+  voice; release to stop. Confirm the host sees a backtick keypress and
+  that Rivals' PTT (bound to grave in-game) keys the mic.
 
 ### Pass-through keys
 
 These carry no GAME binding and fall through to BASE: the right-outer
-thumb (→ RGUI/Super), the top-outer key (→ TAB), and the entire right
-half. The left-outer thumb is now an explicit `&kp LALT`, not a
-fall-through.
+thumb (→ RGUI/Super) and the entire right half. The left-outer thumb is
+an explicit `&kp LALT`, and the top-outer-left key is now `&kp GRAVE`
+(PTT) — neither falls through.
 
 ## GAMENUM — held weapon-switch sublayer
 

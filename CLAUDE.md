@@ -144,13 +144,12 @@ chat (RET), menu (ESC).
   keep it on GAME (physical B). Default H is unused.
 - **LALT = hero profile**, rebound from the default F1 — this is why LALT is
   explicitly bound on the GAME outer-left thumb (pos36). Not vestigial; keep it.
-- **Push-to-talk = grave/backtick (`)** — confirmed in-game. It is **not bound on
-  GAME or GAMENUM**, and Kolter currently plays without keyboard PTT in left-half
-  mode (voice handled off-layer / mouse). Revisit only if keyboard PTT is wanted.
+- **Push-to-talk = grave/backtick (`)** — confirmed in-game. Bound on GAME at
+  the **top-outer-left key (pos0)** as `&kp GRAVE`. Hold to transmit. This is the
+  spare reachable key that previously fell through to TAB; it now hosts PTT.
 - **Mouse-bound (not on the keyboard): melee (V), ping (G / middle mouse), and the
   show-breakable-objects key** — the GAME layer intentionally omits these; don't
   flag them as missing in coverage reviews.
 
-**Future idea (not now):** the top-left key (pos0) currently just duplicates TAB
-(TAB is already on physical Q), so it's a spare reachable key — a candidate home if
-a combat key ever needs one (e.g. keyboard PTT). Deferred.
+The top-left key (pos0) now holds push-to-talk (`&kp GRAVE`); TAB remains on
+physical Q. (This was the deferred spare-key slot — now spent on PTT.)
