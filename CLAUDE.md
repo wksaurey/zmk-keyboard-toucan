@@ -100,6 +100,25 @@ GAME (4)            — left-half-only (right half detached during play)
 The literal ZMK `bindings = < … >` devicetree block from `config/toucan.keymap`.
 Use when editing or showing an exact diff.
 
+### Naming ONE key — lead with its BASE legend
+
+When pointing Kolter at a single physical key, say **what that key is on BASE**
+first: "the right-shift key", "the B key". That is the label his fingers and his
+eyes actually use. Position indices (`pos35`), grid coordinates
+("bottom-row col 11"), and half-relative descriptions ("bottom-right corner") are
+all ambiguous to a reader who is not looking at the keymap source, and
+"bottom-right corner" in particular reads as *the right half's corner* to us and
+as *somewhere near B* to someone picturing the whole board.
+
+Cost of getting this wrong: two extra round-trips confirming which key was meant
+(2026-08-27, binding `&bootloader` — he read "bottom-right corner" as the B key,
+which is on the opposite half and would have flashed the wrong controller).
+
+Format: **BASE legend first, then the position index in parentheses** for the
+edit — `the right-shift key (pos35, ADJ bottom row col 11)`. And when the half
+matters — anything source-local like `&bootloader` or `&sys_reset` — say which
+half the key lives on explicitly, because that is what the behavior acts on.
+
 ## Keep TESTING.md in sync
 
 `TESTING.md` is a manual, on-device test checklist that maps physical keys to
@@ -108,6 +127,41 @@ it if the change affects what any documented key does.** Keymap edits drift the
 test steps silently (a renamed layer, a moved keycode, a changed mod) — stale
 test steps are worse than none. Treat updating TESTING.md as part of the same
 change, not a follow-up.
+
+## Which half needs flashing, and how to prove it
+
+**Left is the central** (`boards/shields/toucan/Kconfig.defconfig`:
+`ZMK_SPLIT_ROLE_CENTRAL` under `if SHIELD_TOUCAN_LEFT`). The keymap, combos,
+behaviors and layer logic all live there; the right half only reports key
+positions. So **any keymap-only change is a LEFT-half flash** — including adding
+a key bound to a right-half position, and including `&bootloader` (verified
+source-local on ZMK v0.3, 2026-08-27: the central relays execution to the half
+the key sits on, so the peripheral gains the key without being reflashed).
+
+**The version stamp makes every build byte-different, so never conclude "the
+right half changed" from a checksum.** `dc9698d`/`a79dbf9` bake `GITHUB_SHA` into
+the display and boot log, so two builds of identical source produce different
+`.uf2` files. To decide whether a half actually needs flashing, diff at block
+level and count:
+
+```python
+a=open(old,'rb').read(); b=open(new,'rb').read()
+diff=[i for i in range(min(len(a),len(b))//512) if a[i*512:(i+1)*512]!=b[i*512:(i+1)*512]]
+```
+
+One differing block out of ~944 = the stamp only, functionally identical
+(measured 2026-08-27). Many differing blocks = real change.
+
+**Cheap pre-CI sanity check on the keymap:** count `&`-bindings per layer; every
+layer must be exactly **42** (12+12+12+6). A miscount is the classic silent
+devicetree break. ZMK source is not vendored locally and `west` is not installed,
+so CI is the only real compile check — the binding count is what catches the
+common error before burning a CI round.
+
+**Downloaded firmware goes to `Downloads/toucan-fw-<sha>/`** (matches the
+`firmware-archive/` README convention). When a newer set supersedes an older one,
+say which folder to use or delete the stale one — two lookalike folders is a
+flashing hazard.
 
 ## GAME / GAMENUM usage
 
