@@ -84,6 +84,15 @@
             bindings = <&kp RSHFT>, <&kp ESC>;
             mods = <(MOD_LSFT)>;
         };
+        // Neither ; nor : is otherwise reachable on SYM — the ; key
+        // carries MINUS to match NAV's KP_MINUS position. Without this,
+        // ); and ): force a layer release mid-expression.
+        sym_semi_colon: sym_semi_colon_morph {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp SEMI>, <&kp COLON>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
     };
 
     keymap {
@@ -112,10 +121,10 @@
         sym {
             display-name = "SYM";
             bindings = <
-                &kp TAB   &kp EXCL &kp AT &kp HASH &kp DLLR &kp PRCNT   &mkp MB2  &kp AMPS  &kp KP_MULTIPLY &kp LPAR &kp RPAR &kp DEL
-                &mt LCTRL CAPS &trans   &trans &trans   &trans   &kp CARET   &kp MINUS &kp EQUAL &kp LBKT        &kp RBKT &kp BSLH &kp GRAVE
-                &kp LSHFT &trans   &trans &trans   &trans   &trans      &kp UNDER &kp PLUS  &kp LBRC        &kp RBRC &kp PIPE &kp TILDE
-                                          &kp LALT &kp RET  &trans      &trans    &kp SPACE &kp RET
+                &kp TAB        &kp EXCL &kp LBKT &kp RBKT &kp UNDER &kp TILDE   &kp GRAVE       &kp DLLR &kp PRCNT &kp CARET &none     &kp DEL
+                &mt LCTRL CAPS &none    &kp LPAR &kp RPAR &kp MINUS &kp BSLH    &sym_semi_colon &kp HASH &kp AT    &kp AMPS  &kp MINUS &kp PLUS
+                &kp LSHFT      &none    &kp LBRC &kp RBRC &kp EQUAL &kp PIPE    &kp EQUAL       &none    &trans    &trans    &kp FSLH  &kp ASTRK
+                                                 &kp LALT &kp RET   &trans      &trans          &kp SPACE &kp RET
             >;
         };
 

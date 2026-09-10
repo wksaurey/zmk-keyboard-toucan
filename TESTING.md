@@ -127,9 +127,15 @@ Current behavior:
 - **Trackpad on SYM** — scroll mode. Slide scrolls the page (Y
   inverted: slide down → page down). Tap still fires MB1 but is
   rarely useful on SYM.
-- **NAV / SYM top-row col 6 (Y position) → `&mkp MB2`.** Hold NAV or
-  SYM and tap Y to right-click. Hold to keep MB2 down for right-drag
-  with the trackpad.
+- **NAV top-row col 6 (Y position) → `&mkp MB2`.** Hold NAV and tap Y
+  to right-click. Hold to keep MB2 down for right-drag with the
+  trackpad.
+- **SYM no longer has MB2** (removed 2026-09-10; that key is now
+  `` ` ``). Right-click on SYM comes from the Azoteq's `two-finger-tap`
+  gesture instead. **Right-DRAG on SYM is gone** — a tap gesture cannot
+  hold a button, and NAV is cursor mode rather than scroll. If
+  right-drag-while-scrolling turns out to matter, rebind `&mkp MB2`
+  onto one of SYM's free keys (`P`, `M`, `A`, `Z`).
 - **NAV top-row col 5 (T position) → `&mkp MB1`** (commit `0fd0665`).
   Hold NAV + T, slide on the trackpad to drag. Works because NAV is
   no longer in the scroller's `layers` list — trackpad-on-NAV is
@@ -169,10 +175,35 @@ Current behavior:
 
 ## SYM — special chars and right-thumb Enter
 
-- Hold SYM. Top row: `!@#$%`. Right side top: `MB2  &*()` (col 6 is
-  now right-click via `&mkp MB2`; `^` was displaced — still available
-  via Shift+6 on BASE). Home row right: `-=[]\` and grave on
-  rightmost. Bottom row right: `_+{}|~`.
+Layer rebuilt 2026-09-10 from measured keystroke frequency. Every
+symbol except `DEL` moved. Test by column, not by memory of the old
+layer.
+
+- **Left half.** Top row `! [ ] _ ~` on Q-W-E-R-T. Home row
+  `(blank) ( ) - \` on A-S-D-F-G. Bottom row `(blank) { } = |` on
+  Z-X-C-V-B.
+- **Brackets are a roll block.** Openers on the ring column (W/S/X),
+  closers on the middle column (E/D/C): `[]` top, `()` home, `{}`
+  bottom. Each pair should roll ring-to-middle without moving the hand.
+- **Right half.** `` ` `` on Y, then `$ % ^` on U-I-O; `; #` `@ &` on
+  H-J-K-L; `=` on N. `P`, `M`, `A` and `Z` are `&none` — verify they
+  emit nothing at all, not a letter.
+- **`,` and `.` are `&trans`** — they fall through to BASE. Hold SYM
+  and tap them for `,` and `.`; add Shift for `<` and `>`.
+- **`;` and `:` share the H key** via the `sym_semi_colon` mod-morph.
+  Hold SYM, tap H → `;`. Hold SYM **and Shift**, tap H → `:`. This is
+  the check that matters most: `);` and `):` should type without
+  releasing SYM.
+- **`-` appears twice on purpose** — on F (the hyphen, for filenames
+  and flags) and on the `;` key (the minus, matching NAV's
+  `KP_MINUS` position). Both must emit `-`.
+- **`=` appears twice on purpose** — on V and on N (matching NAV).
+- **Operator block matches NAV's positions**, not its keycodes: `-` `+`
+  on the `;` and `'` keys, `/` `*` on the `/` and RSHFT keys. Confirm
+  each against the same physical key on NAV.
+- **Known trap:** Shift + the `;` key emits `_`, not `:` — `&kp MINUS`
+  under shift is `LS(MINUS)`. Use H for `:`. If this bites in practice,
+  a mod-morph on the `;` key is the fix.
 - **Right-outer thumb on SYM = `Enter`** (replaces the BASE-layer
   `RGUI`). Lets you hit Enter one-handed on the right while the right
   hand is in trackpad territory — hold SYM with right-inner thumb,
